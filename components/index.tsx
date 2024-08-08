@@ -141,10 +141,15 @@ export default function Component() {
     await generateProof(inputs);
   };
 
+  const deployContract = () => {
+    console.log("Deploying")
+  }
+
   return (
     <>
       <form className="container" onSubmit={submit}>
         <h2>Example starter</h2>
+        <button className="button verify-button" type="button" onClick={deployContract} disabled={!isConnected}> Deploy Contract</button>
         {connectDisconnectButton}
         <h4>Write you own noir circuit with <i>x</i> and <i>y</i> as input names</h4>
         <p>main.nr</p>
@@ -159,8 +164,10 @@ export default function Component() {
           <div className="spinner-button" id="spinner"></div>
         </div>
         <div className="verify-button-container">
-          <button className="button verify-button" type="button" onClick={verifyOnChain} disabled={!isConnected}> Verify on-chain </button>
-          <button className="button verify-button" type="button" onClick={verifyOffChain}> Verify off-chain </button>
+          <button className="button verify-button" type="button" onClick={verifyOnChain} disabled={!isConnected}> Verify
+            on-chain
+          </button>
+          <button className="button verify-button" type="button" onClick={verifyOffChain}> Verify off-chain</button>
         </div>
       </form>
     </>

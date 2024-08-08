@@ -1,0 +1,135 @@
+// @ts-nocheck
+
+import React, {useEffect, useState} from 'react';
+import { useOnChainVerification } from '../hooks/useOnChainVerification.jsx';
+import {compileCircuit} from "../circuit/compile.js";
+import {BarretenbergBackend} from "@noir-lang/backend_barretenberg";
+import {Noir} from "@noir-lang/noir_js";
+import {toast} from "react-toastify";
+import deployment from "../artifacts/deployment.json";
+
+
+export default function Component() {
+  let {isConnected, connectors, deployment, connect, disconnect, switchChain, chains} = useOnChainVerification()
+  // let [isConnectedLocal, setIsConnectedLocal] = useState(isConnected)
+
+
+
+  let connectDisconnectButton = !isConnected ?
+      (
+        <div style={{ padding: '20px 0' }}> <button type="button" key={connectors[0].uid} onClick={() => {
+                  connect({ connector: connectors[0], chainId: deployment.networkConfig.id })
+                  // setIsConnectedLocal(isConnected)
+              }}
+          > Connect wallet </button> </div>
+  ) : (
+        <div><button type="button" onClick={() => { disconnect()
+            // setIsConnectedLocal(isConnected)
+          }}>Disconnect wallet</button></div>
+  )
+
+
+  const generateProof = async (inputs: any) => {
+    if (!inputs) return;
+
+    const compiledCircuit = await compileCircuit(inputs.noir_program);
+    const backend = new BarretenbergBackend(compiledCircuit, { threads: navigator.hardwareConcurrency });
+    const noir = new Noir(compiledCircuit);
+    deactivateSpinner()
+
+    await toast.promise(noir.init, {
+      pending: 'Initializing Noir...',
+      success: 'Noir initialized!',
+      error: 'Error initializing Noir',
+    });
+
+    const { witness } = await toast.promise(noir.execute(inputs), {
+      pending: 'ACVM Executing compiledCircuit --> Generating witness',
+      success: 'Witness generated',
+      error: 'Error generating witness',
+    });
+    if (!witness) return;
+
+    const proofData = await toast.promise(backend.generateProof(witness), {
+      pending: 'Generating proof',
+      success: 'Proof generated',
+      error: 'Error generating proof',
+    });
+    if (!proofData) return;
+
+    return {backend, proofData}
+  };
+
+  const getSpinnerElements = () => {
+    const spinner = document.getElementById('spinner')!;
+    const submitBtn = document.getElementById('submit')! ;
+    return [submitBtn, spinner]
+  }
+
+  const deactivateSpinner = () => {
+    let [submitBtn, spinner] = getSpinnerElements()
+    spinner.style.display = 'none';
+    submitBtn.disabled = false;
+  }
+
+  const activateSpinner = () => {
+    let [submitBtn, spinner] = getSpinnerElements()
+    spinner.style.display = 'inline-block';
+    submitBtn.disabled = true;
+  }
+
+  const submit = async (e: React.FormEvent<HTMLFormElement>) => {
+    try {
+      await _submit(e)
+    } catch {
+      deactivateSpinner()
+    }
+  }
+
+  const _submit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    activateSpinner()
+
+    const elements = e.currentTarget.elements;
+    if (!elements) return;
+
+    const x = elements.namedItem('x') as HTMLInputElement;
+    const y = elements.namedItem('y') as HTMLInputElement;
+    const noir_program = elements.namedItem('noir_program') as HTMLInputElement;
+
+    let inputs = {
+      x: x.value,
+      y: y.value,
+      noir_program: noir_program.value,
+    };
+
+    let {backend, proofData} = await generateProof(inputs)
+    await toast.promise(backend.verifyProof(proofData), {
+      pending: 'Verifying proof off-chain',
+      success: 'Proof verified off-chain',
+      error: 'Error verifying proof off-chain',
+    });
+  };
+
+  return (
+    <>
+      <form className="container" onSubmit={submit}>
+        <h2>Example starter</h2>
+        <h4>Write you own noir circuit with <i>x</i> and <i>y</i> as input names</h4>
+        <p>main.nr</p>
+        <textarea className="program" name="noir_program"/>
+        <p>Try it!</p>
+        <div className="inputs">
+          <input className="text-input" name="x" type="text" placeholder="x"/>
+          <input className="text-input" name="y" type="text" placeholder="y"/>
+        </div>
+        <div className="button-container">
+          <button className="button" type="submit" id="submit">Calculate proof</button>
+          <div className="spinner-button" id="spinner"></div>
+        </div>
+        {connectDisconnectButton}
+      </form>
+    </>
+  );
+}
+

@@ -2,21 +2,28 @@
 
 import React, { useEffect, useState } from 'react';
 import { useOnChainVerification } from '../hooks/useOnChainVerification.jsx';
+import hre from "hardhat";
+
 import { compileCircuit } from '../circuit/compile.js';
 import { BarretenbergBackend } from '@noir-lang/backend_barretenberg';
 import { Noir } from '@noir-lang/noir_js';
 import { toast } from 'react-toastify';
 import { useReadUltraVerifierVerify } from '../artifacts/generated.js';
 import { bytesToHex } from 'viem';
+import { generateVerifierContract } from './contract.js';
 
 
 export default function Component() {
-  let { isConnected, connectDisconnectButton } = useOnChainVerification();
+
+  // let { isConnected, connectDisconnectButton } = useOnChainVerification();
+  let connectDisconnectButton=undefined
+  let isConnected=false;
+
   const [backend, setBackend] = useState();
   let [provingArgs, setProvingArgs] = useState();
   const [args, setArgs] = useState();
+  const [currentCompiledCircuit, setCurrentCompiledCircuit] = useState();
   const { data, error } = useReadUltraVerifierVerify({args, query: {enabled: !!args}});
-
 
   const generateProof = async (inputs: any) => {
     if (!inputs) return;
@@ -47,7 +54,7 @@ export default function Component() {
     if (!proofData) return;
     setProvingArgs(proofData)
     setBackend(barretenbergBackend)
-
+    setCurrentCompiledCircuit(compiledCircuit)
   };
 
   const getSpinnerElements = () => {
@@ -123,15 +130,19 @@ export default function Component() {
     await generateProof(inputs);
   };
 
-  const deployContract = () => {
+  async function generateAnddeployContract(){
     console.log("Deploying")
+    if (!currentCompiledCircuit) {
+      console.log("Cannot generate contract because no circuit was provided")
+    }
+    let contract = await generateVerifierContract(currentCompiledCircuit)
+    console.log(contract)
   }
 
   return (
     <>
       <form className="container" onSubmit={submit}>
         <h2>Example starter</h2>
-        <button className="button verify-button" type="button" onClick={deployContract}> Deploy Contract</button>
         {connectDisconnectButton}
         <h4>Write you own noir circuit with <i>x</i> and <i>y</i> as input names</h4>
         <p>main.nr</p>
@@ -145,6 +156,9 @@ export default function Component() {
           <button className="button prove-button" type="submit" id="submit">Calculate proof</button>
           <div className="spinner-button" id="spinner"></div>
         </div>
+        <button className="button verify-button" type="button" onClick={generateAnddeployContract}> Deploy Contract
+        </button>
+
         <div className="verify-button-container">
           <button className="button verify-button" type="button" onClick={verifyOnChain} disabled={!isConnected}> Verify
             on-chain

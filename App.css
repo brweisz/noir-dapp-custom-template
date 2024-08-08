@@ -88,6 +88,12 @@ textarea {
   height: 100px;
 }
 
+textarea:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 5px rgba(74, 144, 226, 0.8);
+  outline: none;
+}
+
 .button {
   background-color: var(--accent);
   border-radius: 10px;

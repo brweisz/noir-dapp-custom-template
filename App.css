@@ -60,6 +60,11 @@ small {font-size: 0.750rem; /* 12px */}
   gap: 30px;
 }
 
+.verify-button-container{
+  display: flex;
+  gap: 40px;
+}
+
 .text-input {
   border: 1px solid black;
   border-radius: 5px;
@@ -79,12 +84,20 @@ textarea {
 }
 
 .button {
-  height: 30px;
-  width: 300px;
   background-color: var(--accent);
   border-radius: 10px;
   border: none;
   box-shadow: 0 5px #999;
+}
+
+.prove-button {
+  height: 30px;
+  width: 300px;
+}
+
+.verify-button {
+  height: 30px;
+  width: 200px;
 }
 
 .generate-proof-button-container {

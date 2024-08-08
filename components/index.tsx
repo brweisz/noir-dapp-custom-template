@@ -13,25 +13,23 @@ import { bytesToHex } from 'viem';
 
 export default function Component() {
   let { isConnected, connectors, connect, disconnect } = useOnChainVerification();
-
-  // ------- WE WANT TO VERIFY ON CHAIN ---------- //
   const [backend, setBackend] = useState();
   const [args, setArgs] = useState();
   let [verificationArgs, setVerificationArgs] = useState();
   const { data, error } = useReadUltraVerifierVerify({args, query: {enabled: !!args,},});
-  // --------------------------------------------- //
+
 
   let connectDisconnectButton = !isConnected ?
     (
-      <div style={{ padding: '20px 0' }}>
-        <button type="button" key={connectors[0].uid} onClick={() => {
+      <div>
+        <button type="button" className="button verify-button" key={connectors[0].uid} onClick={() => {
           connect({ connector: connectors[0], chainId: deployment.networkConfig.id });
         }}> Connect wallet
         </button>
       </div>
     ) : (
       <div>
-        <button type="button" onClick={() => {
+        <button type="button" className="button verify-button" onClick={() => {
           disconnect();
         }}>Disconnect wallet
         </button>
@@ -157,12 +155,12 @@ export default function Component() {
           <input className="text-input" name="y" type="text" placeholder="y" />
         </div>
         <div className="generate-proof-button-container">
-          <button className="button" type="submit" id="submit">Calculate proof</button>
+          <button className="button prove-button" type="submit" id="submit">Calculate proof</button>
           <div className="spinner-button" id="spinner"></div>
         </div>
         <div className="verify-button-container">
-          <button type="button" onClick={verifyOnChain}> Verify on-chain </button>
-          <button type="button" onClick={verifyOffChain}> Verify off-chain </button>
+          <button className="button verify-button" type="button" onClick={verifyOnChain} disabled={!isConnected}> Verify on-chain </button>
+          <button className="button verify-button" type="button" onClick={verifyOffChain}> Verify off-chain </button>
         </div>
       </form>
     </>

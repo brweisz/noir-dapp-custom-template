@@ -8,6 +8,7 @@ import { Noir } from '@noir-lang/noir_js';
 import { toast } from 'react-toastify';
 import deployment from '../artifacts/deployment.json';
 import { useReadUltraVerifierVerify } from '../artifacts/generated.js';
+import { bytesToHex } from 'viem';
 
 
 export default function Component() {
@@ -18,6 +19,7 @@ export default function Component() {
   const [args, setArgs] = useState();
   let [verificationArgs, setVerificationArgs] = useState();
   const { data, error } = useReadUltraVerifierVerify({args, query: {enabled: !!args,},});
+  // --------------------------------------------- //
 
   let connectDisconnectButton = !isConnected ?
     (
@@ -96,8 +98,22 @@ export default function Component() {
   };
 
   const verifyOnChain = async function() {
-
+    setArgs([bytesToHex(verificationArgs.proof), verificationArgs.publicInputs as `0x${string}`[]]);
   }
+
+  useEffect(() => {
+    if (data) {
+      toast.success( 'Proof verified on-chain!', {
+        isLoading: false,
+        autoClose: 5000
+      })
+    } else if (error) {
+      toast.error(`Failed proof verification on-chain: ${error}`, {
+        isLoading: false,
+        autoClose: 5000
+      });
+    }
+  }, [data, error]);
 
   const verifyOffChain = async function(){
     await toast.promise(backend.verifyProof(verificationArgs), {

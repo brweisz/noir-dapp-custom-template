@@ -156,7 +156,7 @@ export default function Component() {
           <button className="button prove-button" type="submit" id="submit">Calculate proof</button>
           <div className="spinner-button" id="spinner"></div>
         </div>
-        <button className="button verify-button" type="button" onClick={generateAnddeployContract}> Deploy Contract
+        <button className="button verify-button" type="button" onClick={generateAnddeployContract} disabled={!currentCompiledCircuit}> Generate Verifier Contract
         </button>
 
         <div className="verify-button-container">

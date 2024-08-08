@@ -90,6 +90,10 @@ textarea {
   box-shadow: 0 5px #999;
 }
 
+.button:disabled {
+  color: #830234;
+}
+
 .prove-button {
   height: 30px;
   width: 300px;

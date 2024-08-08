@@ -142,7 +142,7 @@ export default function Component() {
   return (
     <>
       <form className="container" onSubmit={submit}>
-        <h2>Example starter</h2>
+        <h2>Noir <span className="funky-typography">Playground</span></h2>
         {connectDisconnectButton}
         <h4>Write you own noir circuit with <i>x</i> and <i>y</i> as input names</h4>
         <p>main.nr</p>

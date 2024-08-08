@@ -1,8 +1,7 @@
-import { ProofData } from '@noir-lang/types';
 import { useAccount, useConnect, useDisconnect, useSwitchChain } from 'wagmi';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 
-export function useOnChainVerification(proofData?: ProofData) {
+export function useOnChainVerification() {
   const { connect, connectors } = useConnect();
   const { disconnect } = useDisconnect();
   const { isConnected } = useAccount();

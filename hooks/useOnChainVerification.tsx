@@ -1,5 +1,6 @@
 import { useAccount, useConnect, useDisconnect, useSwitchChain } from 'wagmi';
-import { useEffect } from 'react';
+import React, { useEffect } from 'react';
+import deployment from '../artifacts/deployment.json';
 
 export function useOnChainVerification() {
   const { connect, connectors } = useConnect();
@@ -11,5 +12,22 @@ export function useOnChainVerification() {
     switchChain({ chainId: chains[0].id });
   }, []);
 
-  return {isConnected, connectors, connect, disconnect, switchChain, chains}
+  let connectDisconnectButton = !isConnected ?
+    (
+      <div>
+        <button type="button" className="button verify-button" key={connectors[0].uid} onClick={() => {
+          connect({ connector: connectors[0], chainId: deployment.networkConfig.id });
+        }}> Connect wallet
+        </button>
+      </div>
+    ) : (
+      <div>
+        <button type="button" className="button verify-button" onClick={() => {
+          disconnect();
+        }}>Disconnect wallet
+        </button>
+      </div>
+    );
+
+  return {isConnected, connectDisconnectButton}
 }

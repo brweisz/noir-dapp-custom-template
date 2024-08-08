@@ -6,35 +6,16 @@ import { compileCircuit } from '../circuit/compile.js';
 import { BarretenbergBackend } from '@noir-lang/backend_barretenberg';
 import { Noir } from '@noir-lang/noir_js';
 import { toast } from 'react-toastify';
-import deployment from '../artifacts/deployment.json';
 import { useReadUltraVerifierVerify } from '../artifacts/generated.js';
 import { bytesToHex } from 'viem';
 
 
 export default function Component() {
-  let { isConnected, connectors, connect, disconnect } = useOnChainVerification();
+  let { isConnected, connectDisconnectButton } = useOnChainVerification();
   const [backend, setBackend] = useState();
+  let [provingArgs, setProvingArgs] = useState();
   const [args, setArgs] = useState();
-  let [verificationArgs, setVerificationArgs] = useState();
-  const { data, error } = useReadUltraVerifierVerify({args, query: {enabled: !!args,},});
-
-
-  let connectDisconnectButton = !isConnected ?
-    (
-      <div>
-        <button type="button" className="button verify-button" key={connectors[0].uid} onClick={() => {
-          connect({ connector: connectors[0], chainId: deployment.networkConfig.id });
-        }}> Connect wallet
-        </button>
-      </div>
-    ) : (
-      <div>
-        <button type="button" className="button verify-button" onClick={() => {
-          disconnect();
-        }}>Disconnect wallet
-        </button>
-      </div>
-    );
+  const { data, error } = useReadUltraVerifierVerify({args, query: {enabled: !!args}});
 
 
   const generateProof = async (inputs: any) => {
@@ -64,7 +45,7 @@ export default function Component() {
       error: 'Error generating proof',
     });
     if (!proofData) return;
-    setVerificationArgs(proofData)
+    setProvingArgs(proofData)
     setBackend(barretenbergBackend)
 
   };
@@ -96,7 +77,7 @@ export default function Component() {
   };
 
   const verifyOnChain = async function() {
-    setArgs([bytesToHex(verificationArgs.proof), verificationArgs.publicInputs as `0x${string}`[]]);
+    setArgs([bytesToHex(provingArgs.proof), provingArgs.publicInputs as `0x${string}`[]]);
   }
 
   useEffect(() => {
@@ -111,10 +92,11 @@ export default function Component() {
         autoClose: 5000
       });
     }
+    setArgs(undefined)
   }, [data, error]);
 
   const verifyOffChain = async function(){
-    await toast.promise(backend.verifyProof(verificationArgs), {
+    await toast.promise(backend.verifyProof(provingArgs), {
       pending: 'Verifying proof off-chain',
       success: 'Proof verified off-chain',
       error: 'Error verifying proof off-chain',
@@ -149,7 +131,7 @@ export default function Component() {
     <>
       <form className="container" onSubmit={submit}>
         <h2>Example starter</h2>
-        <button className="button verify-button" type="button" onClick={deployContract} disabled={!isConnected}> Deploy Contract</button>
+        <button className="button verify-button" type="button" onClick={deployContract}> Deploy Contract</button>
         {connectDisconnectButton}
         <h4>Write you own noir circuit with <i>x</i> and <i>y</i> as input names</h4>
         <p>main.nr</p>

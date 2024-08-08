@@ -87,7 +87,7 @@ textarea {
   box-shadow: 0 5px #999;
 }
 
-.button-container {
+.generate-proof-button-container {
   display: flex;
   gap: 30px;
 }

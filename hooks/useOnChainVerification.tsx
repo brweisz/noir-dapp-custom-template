@@ -4,7 +4,6 @@ import { bytesToHex } from 'viem';
 import { useEffect, useState } from 'react';
 import { Id, toast } from 'react-toastify';
 import { ultraVerifierAddress, useReadUltraVerifierVerify } from '../artifacts/generated.js';
-import deployment from '../artifacts/deployment.json';
 
 export function useOnChainVerification(proofData?: ProofData) {
   const { connect, connectors } = useConnect();
@@ -18,7 +17,6 @@ export function useOnChainVerification(proofData?: ProofData) {
   const { data, error } = useReadUltraVerifierVerify({args, query: {enabled: !!args,},});
 
   useEffect(() => {
-    console.log(chains)
     switchChain({ chainId: chains[0].id });
     // setArgs([bytesToHex(proofData.proof), proofData.publicInputs as `0x${string}`[]]);
   }, []);
@@ -41,7 +39,7 @@ export function useOnChainVerification(proofData?: ProofData) {
     }
   }, [data, error]);*/
 
-  return {isConnected, connectors, deployment, connect, disconnect, switchChain, chains}
+  return {isConnected, connectors, connect, disconnect, switchChain, chains}
 
   /*if (!isConnected) {
     return (

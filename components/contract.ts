@@ -1,4 +1,3 @@
-import { gunzipSync } from 'zlib';
 import pako from 'pako';
 import { Barretenberg, Crs, RawBuffer } from '@aztec/bb.js';
 

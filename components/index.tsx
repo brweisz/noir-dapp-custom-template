@@ -1,8 +1,6 @@
 // @ts-nocheck
 
 import React, { useEffect, useState } from 'react';
-import { useOnChainVerification } from '../hooks/useOnChainVerification.jsx';
-import hre from "hardhat";
 
 import { compileCircuit } from '../circuit/compile.js';
 import { BarretenbergBackend } from '@noir-lang/backend_barretenberg';
@@ -146,15 +144,17 @@ export default function Component() {
         {connectDisconnectButton}
         <h4>Write you own noir circuit with <i>x</i> and <i>y</i> as input names</h4>
         <p>main.nr</p>
-        <textarea className="program" name="noir_program" />
+        <textarea className="program" name="noir_program" required={true}/>
         <p>Try it!</p>
         <div className="inputs">
-          <input className="text-input" name="x" type="text" placeholder="x" />
-          <input className="text-input" name="y" type="text" placeholder="y" />
+          <input className="text-input" name="x" type="text" placeholder="x" required={true}/>
+          <input className="text-input" name="y" type="text" placeholder="y" required={true}/>
         </div>
         <div className="generate-proof-button-container">
           <button className="button prove-button" type="submit" id="submit">Calculate proof</button>
           <div className="spinner-button" id="spinner"></div>
+          <button className="button verify-button" type="button" onClick={verifyOffChain} disabled={!currentCompiledCircuit}>
+            Verify off-chain</button>
         </div>
         <button className="button verify-button" type="button" onClick={generateAnddeployContract} disabled={!currentCompiledCircuit}> Generate Verifier Contract
         </button>
@@ -163,7 +163,7 @@ export default function Component() {
           <button className="button verify-button" type="button" onClick={verifyOnChain} disabled={!isConnected}> Verify
             on-chain
           </button>
-          <button className="button verify-button" type="button" onClick={verifyOffChain}> Verify off-chain</button>
+
         </div>
       </form>
     </>

@@ -4,7 +4,8 @@
   "type": "module",
   "description": "A template repository to get started with writing zero knowledge programs with Noir.",
   "scripts": {
-    "test": "test/test.sh"
+    "test": "test/test.sh",
+    "dev": "bunx hardhat node & bunx hardhat dev &"
   },
   "dependencies": {
     "@noir-lang/backend_barretenberg": "^0.31.0",

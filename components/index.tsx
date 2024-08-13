@@ -6,7 +6,7 @@ import { compileCircuit } from '../circuit/compile.js';
 import { BarretenbergBackend } from '@noir-lang/backend_barretenberg';
 import { Noir } from '@noir-lang/noir_js';
 import { toast } from 'react-toastify';
-import { useReadUltraVerifierVerify } from '../artifacts/generated.js';
+// import { useReadUltraVerifierVerify } from '../artifacts/generated.js';
 import { bytesToHex } from 'viem';
 import { generateVerifierContract } from './contract.js';
 
@@ -21,7 +21,7 @@ export default function Component() {
   let [provingArgs, setProvingArgs] = useState();
   const [args, setArgs] = useState();
   const [currentCompiledCircuit, setCurrentCompiledCircuit] = useState();
-  const { data, error } = useReadUltraVerifierVerify({args, query: {enabled: !!args}});
+  // const { data, error } = useReadUltraVerifierVerify({args, query: {enabled: !!args}});
 
   const generateProof = async (inputs: any) => {
     if (!inputs) return;
@@ -85,7 +85,7 @@ export default function Component() {
     setArgs([bytesToHex(provingArgs.proof), provingArgs.publicInputs as `0x${string}`[]]);
   }
 
-  useEffect(() => {
+  /*useEffect(() => {
     if (data) {
       toast.success( 'Proof verified on-chain!', {
         isLoading: false,
@@ -98,7 +98,7 @@ export default function Component() {
       });
     }
     setArgs(undefined)
-  }, [data, error]);
+  }, [data, error]);*/
 
   const verifyOffChain = async function(){
     await toast.promise(backend.verifyProof(provingArgs), {
@@ -128,14 +128,31 @@ export default function Component() {
     await generateProof(inputs);
   };
 
-  async function generateAnddeployContract(){
+  async function generateAndDeployContract(){
     console.log("Deploying")
     if (!currentCompiledCircuit) {
       console.log("Cannot generate contract because no circuit was provided")
     }
-    let contract = await generateVerifierContract(currentCompiledCircuit)
-    console.log(contract)
+    let contractSourceCode = await generateVerifierContract(currentCompiledCircuit)
+    console.log("Contract successfully created")
+    console.log("Compiling and deploying contract")
+    let address = await compileAndDeploy(contractSourceCode)
   }
+
+  const compileAndDeploy = async (contractSourceCode) => {
+    const response = await fetch('/api/compile-and-deploy-contract', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ contractSourceCode }),
+    });
+
+    const data = await response.json();
+    console.log('Deployed contract address:', data.object.contractAddress);
+    return data.object.contractAddress
+  };
+
 
   return (
     <>
@@ -156,7 +173,7 @@ export default function Component() {
           <button className="button verify-button" type="button" onClick={verifyOffChain} disabled={!currentCompiledCircuit}>
             Verify off-chain</button>
         </div>
-        <button className="button verify-button" type="button" onClick={generateAnddeployContract} disabled={!currentCompiledCircuit}> Generate Verifier Contract
+        <button className="button verify-button" type="button" onClick={generateAndDeployContract} disabled={!currentCompiledCircuit}> Generate Verifier Contract
         </button>
 
         <div className="verify-button-container">

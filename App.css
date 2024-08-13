@@ -1,5 +1,6 @@
 @import url('https://fonts.googleapis.com/css?family=Libre%20Bodoni:700|Libre%20Bodoni:400');
 @import url('https://fonts.googleapis.com/css?family=Mystery%20Quest:700|Mystery%20Quest:400');
+@import url('https://fonts.googleapis.com/css?family=Henny%20Penny:700|Henny%20Penny:400');
 
 .faded {
   opacity: 0.5;
@@ -50,7 +51,8 @@ h5 {font-size: 1.333rem; /* 21.28px */}
 small {font-size: 0.750rem; /* 12px */}
 
 .funky-typography {
-  font-family: 'Mystery Quest', fantasy;
+  font-family: 'Henny Penny', fantasy;
+  /*font-family: 'Mystery Quest', fantasy;*/
 }
 
 .container {

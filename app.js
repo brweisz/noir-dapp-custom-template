@@ -1,9 +1,9 @@
 import express from 'express';
-import Web3 from 'web3';
 import { writeFileSync } from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import hardhat from 'hardhat';
+import { exec } from 'child_process';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -11,8 +11,6 @@ const __dirname = path.dirname(__filename);
 const app = express();
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
-
-const web3 = new Web3('http://localhost:8545');
 
 async function compileContract(contractSourceCode){
   console.log("Writing file")
@@ -45,7 +43,8 @@ app.post("/compile-and-deploy-contract", async (req, res) => {
     let { contractSourceCode } = req.body;
     await compileContract(contractSourceCode)
     await deployCompiledContract()
-    let deployment = await import("./artifacts/deployment.json", { assert: { type: 'json' } });
+    let deployment = await import("./artifacts/deployment_with_address.json", { assert: { type: 'json' } });
+    exec("wagmi generate")
     response.object = { contractAddress: deployment.default.address }
   } catch (e) {
     console.log(e)

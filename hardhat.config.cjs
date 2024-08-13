@@ -110,7 +110,7 @@ task('deploy', 'Deploys the verifier contract')
     console.log(
       `Attached to address ${verifier.address} at network ${hre.network.name} with chainId ${config.networkConfig.id}...`,
     );
-    writeFileSync('artifacts/deployment.json', JSON.stringify(config), { flag: 'w' });
+    writeFileSync('artifacts/deployment_with_address.json', JSON.stringify(config), { flag: 'w' });
   });
 
 subtask('generateHooks', 'Generates hooks for the verifier contract').setAction(async (_, hre) => {

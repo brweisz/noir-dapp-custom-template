@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 
+import { useOnChainVerification } from '../hooks/useOnChainVerification.js';
 import { compileCircuit } from '../circuit/compile.js';
 import { BarretenbergBackend } from '@noir-lang/backend_barretenberg';
 import { Noir } from '@noir-lang/noir_js';
@@ -13,9 +14,9 @@ import { generateVerifierContract } from './contract.js';
 
 export default function Component() {
 
-  // let { isConnected, connectDisconnectButton } = useOnChainVerification();
-  let connectDisconnectButton=undefined
-  let isConnected=false;
+  // let connectDisconnectButton=undefined;
+  // let isConnected=false;
+  let { isConnected, connectDisconnectButton } = useOnChainVerification();
 
   const [backend, setBackend] = useState();
   let [provingArgs, setProvingArgs] = useState();
@@ -153,7 +154,6 @@ export default function Component() {
     return data.object.contractAddress
   };
 
-
   return (
     <>
       <form className="container" onSubmit={submit}>
@@ -177,8 +177,8 @@ export default function Component() {
         </button>
 
         <div className="verify-button-container">
-          <button className="button verify-button" type="button" onClick={verifyOnChain} disabled={!isConnected}> Verify
-            on-chain
+          <button className="button verify-button" type="button" onClick={verifyOnChain} disabled={!isConnected || !currentCompiledCircuit}>
+            Verify on-chain
           </button>
 
         </div>

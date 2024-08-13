@@ -81,7 +81,7 @@ Feel free to add more networks, as long as they're supported by `wagmi`
 ([list here](https://wagmi.sh/react/api/chains#available-chains)). Just make sure you:
 
 - Have funds in these accounts
-- Add their configuration in the `networks` property in `hardhat.config.cts`
+- Add their configuration in the `networks` property in `hardhat.config.cjs`
 - Use the name that wagmi expects (for example `ethereum` won't work, as `wagmi` calls it `mainnet`)
 
 #### Attaching to an existing contract

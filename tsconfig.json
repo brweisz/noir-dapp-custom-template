@@ -25,5 +25,7 @@
   },
   "exclude": ["dist", "node_modules"],
   "include": ["./test", "./components", "./scripts"],
-  "files": ["hardhat.config.cts"]
+  "files": [
+    "hardhat.config.cjs"
+  ]
 }

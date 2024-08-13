@@ -1,20 +1,20 @@
-import '@nomicfoundation/hardhat-toolbox-viem';
-import '@nomicfoundation/hardhat-viem';
-import '@nomicfoundation/hardhat-chai-matchers';
+require('@nomicfoundation/hardhat-toolbox-viem');
+require('@nomicfoundation/hardhat-viem');
+require('@nomicfoundation/hardhat-chai-matchers');
 
-import { HardhatUserConfig, scope, task, types } from 'hardhat/config';
+const { HardhatUserConfig, scope, task, types } = require('hardhat/config');
 
-import { subtask, vars } from 'hardhat/config';
-import { TASK_COMPILE_SOLIDITY } from 'hardhat/builtin-tasks/task-names';
-import { join, resolve } from 'path';
-import { writeFile } from 'fs/promises';
-import { mkdirSync, writeFileSync } from 'fs';
-import { gunzipSync } from 'zlib';
-import { Barretenberg, RawBuffer, Crs } from '@aztec/bb.js';
-import { createFileManager, compile } from '@noir-lang/noir_wasm';
-import { CompiledCircuit } from '@noir-lang/types';
-import { exec } from 'shelljs';
-import { Chain } from 'viem';
+const { subtask, vars } = require('hardhat/config');
+const { TASK_COMPILE_SOLIDITY } = require('hardhat/builtin-tasks/task-names');
+const { join, resolve } = require('path');
+const { writeFile } = require('fs/promises');
+const { mkdirSync, writeFileSync } = require('fs');
+const { gunzipSync } = require('zlib');
+const { Barretenberg, RawBuffer, Crs } = require('@aztec/bb.js');
+const { createFileManager, compile } = require('@noir-lang/noir_wasm');
+const { CompiledCircuit } = require('@noir-lang/types');
+const { exec } = require('shelljs');
+const { Chain } = require('viem');
 
 subtask(TASK_COMPILE_SOLIDITY).setAction(async (_, { config }, runSuper) => {
   const superRes = await runSuper();
@@ -28,17 +28,17 @@ subtask(TASK_COMPILE_SOLIDITY).setAction(async (_, { config }, runSuper) => {
   return superRes;
 });
 
-export async function compileCircuit(path = './circuit') {
+async function compileCircuit(path = './circuit') {
   const basePath = resolve(join(path));
   const fm = createFileManager(basePath);
   const result = await compile(fm);
   if (!('program' in result)) {
     throw new Error('Compilation failed');
   }
-  return result.program as CompiledCircuit;
+  return result.program;
 }
 
-export async function generateArtifacts(path = './circuit', crsPath = './crs') {
+async function generateArtifacts(path = './circuit', crsPath = './crs') {
   const circuit = await compileCircuit(path);
   const decompressed = gunzipSync(Buffer.from(circuit.bytecode, 'base64'));
   const api = await Barretenberg.new({ threads: 8 });
@@ -61,19 +61,19 @@ export async function generateArtifacts(path = './circuit', crsPath = './crs') {
   return { circuit, contract };
 }
 
-task('compile', 'Compile and generate circuits and contracts').setAction(
+/*task('compile', 'Compile and generate circuits and contracts').setAction(
   async (_, __, runSuper) => {
     const { circuit, contract } = await generateArtifacts();
-    mkdirSync('artifacts', { recursive: true });
+    // mkdirSync('artifacts', { recursive: true });
     writeFileSync('artifacts/circuit.json', JSON.stringify(circuit), { flag: 'w' });
     writeFileSync('artifacts/contract.sol', contract, { flag: 'w' });
     await runSuper();
   },
-);
+);*/
 
-task('node', 'Runs a local blockchain').setAction(async (_: any, hre, runSuper) => {
-  console.log("We're here")
-  const networkConfig = (await import(`viem/chains`))[hre.network.name] as Chain;
+task('node', 'Runs a local blockchain').setAction(async (_, hre, runSuper) => {
+  console.log("Starting network...")
+  const networkConfig = (await import(`viem/chains`))[hre.network.name];
   const config = {
     name: hre.network.name,
     networkConfig: {
@@ -96,7 +96,7 @@ task('deploy', 'Deploys the verifier contract')
       verifier = await hre.viem.deployContract('UltraVerifier');
     }
 
-    const networkConfig = (await import(`viem/chains`))[hre.network.name] as Chain;
+    const networkConfig = (await import(`viem/chains`))[hre.network.name];
     console.log(networkConfig);
     const config = {
       name: hre.network.name,
@@ -148,12 +148,16 @@ task('serve', 'Serves the frontend project').setAction(async (_, hre) => {
   exec('vite preview');
 });
 
-const config: HardhatUserConfig = {
+module.exports = {
   solidity: {
-    version: '0.8.18',
-    settings: {
-      optimizer: { enabled: true, runs: 5000 },
-    },
+    compilers: [
+      {
+        version: '0.8.4',
+        settings: {
+          optimizer: { enabled: true, runs: 200 },
+        },
+      },
+    ],
   },
   defaultNetwork: 'localhost',
   networks: {
@@ -179,5 +183,3 @@ const config: HardhatUserConfig = {
     artifacts: './artifacts/hardhat',
   },
 };
-
-export default config;

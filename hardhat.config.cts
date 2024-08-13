@@ -71,6 +71,21 @@ task('compile', 'Compile and generate circuits and contracts').setAction(
   },
 );
 
+task('node', 'Runs a local blockchain').setAction(async (_: any, hre, runSuper) => {
+  console.log("We're here")
+  const networkConfig = (await import(`viem/chains`))[hre.network.name] as Chain;
+  const config = {
+    name: hre.network.name,
+    networkConfig: {
+      ...networkConfig,
+      id: hre.network.config.chainId || networkConfig.id,
+    },
+  };
+  mkdirSync('artifacts', { recursive: true });
+  writeFileSync('artifacts/deployment.json', JSON.stringify(config), { flag: 'w' });
+  await runSuper();
+})
+
 task('deploy', 'Deploys the verifier contract')
   .addOptionalParam('attach', 'Attach to an existing address', '', types.string)
   .setAction(async ({ attach }, hre) => {

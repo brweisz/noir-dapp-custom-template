@@ -72,7 +72,9 @@ small {font-size: 0.750rem; /* 12px */}
 
 .verify-button-container{
   display: flex;
-  gap: 40px;
+  flex-direction: column;
+  gap: 20px;
+  align-items: center;
 }
 
 .text-input {
@@ -156,4 +158,8 @@ textarea:focus, input:focus {
   left: 50%;
   /* bring your own prefixes */
   transform: translate(-50%, -50%);
+}
+
+.contract-address {
+  font-size: 10px;
 }

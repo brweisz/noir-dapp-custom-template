@@ -1,28 +1,39 @@
 // @ts-nocheck
 
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 
 import { useOnChainVerification } from '../hooks/useOnChainVerification.js';
 import { compileCircuit } from '../circuit/compile.js';
 import { BarretenbergBackend } from '@noir-lang/backend_barretenberg';
 import { Noir } from '@noir-lang/noir_js';
 import { toast } from 'react-toastify';
-// import { useReadUltraVerifierVerify } from '../artifacts/generated.js';
 import { bytesToHex } from 'viem';
 import { generateVerifierContract } from './contract.js';
-
+import { createUseReadContract } from 'wagmi/codegen';
+import { ultraVerifierAbi } from '../hooks/verifierContractABI.ts';
 
 export default function Component() {
 
-  // let connectDisconnectButton=undefined;
-  // let isConnected=false;
   let { isConnected, connectDisconnectButton } = useOnChainVerification();
 
   const [backend, setBackend] = useState();
   let [provingArgs, setProvingArgs] = useState();
-  const [args, setArgs] = useState();
   const [currentCompiledCircuit, setCurrentCompiledCircuit] = useState();
-  // const { data, error } = useReadUltraVerifierVerify({args, query: {enabled: !!args}});
+
+  let [contractAddress, setContractAddress] = useState(undefined);
+  const [args, setArgs] = useState();
+  let useReadUltraVerifierVerify = createUseReadContract({
+    abi: ultraVerifierAbi,
+    address: contractAddress,
+    functionName: 'verify',
+  })
+  const { data, error } = useReadUltraVerifierVerify({args, query: {enabled: !!args}});
+
+
+  const verifyOnChain = async function() {
+    console.log("Verifying on chain")
+    setArgs([bytesToHex(provingArgs.proof), provingArgs.publicInputs as `0x${string}`[]]);
+    setTimeout(()=> setArgs(undefined), 1000)}
 
   const generateProof = async (inputs: any) => {
     if (!inputs) return;
@@ -82,10 +93,6 @@ export default function Component() {
     }
   };
 
-  const verifyOnChain = async function() {
-    setArgs([bytesToHex(provingArgs.proof), provingArgs.publicInputs as `0x${string}`[]]);
-  }
-
   /*useEffect(() => {
     if (data) {
       toast.success( 'Proof verified on-chain!', {
@@ -138,6 +145,7 @@ export default function Component() {
     console.log("Contract successfully created")
     console.log("Compiling and deploying contract")
     let address = await compileAndDeploy(contractSourceCode)
+    setContractAddress(address)
   }
 
   const compileAndDeploy = async (contractSourceCode) => {
@@ -149,9 +157,10 @@ export default function Component() {
       body: JSON.stringify({ contractSourceCode }),
     });
 
-    const data = await response.json();
-    console.log('Deployed contract address:', data.object.contractAddress);
-    return data.object.contractAddress
+    const response_data = await response.json();
+    let contractAddress = response_data.object.contractAddress;
+    console.log('Deployed contract address:', contractAddress);
+    return contractAddress
   };
 
   return (
@@ -173,14 +182,14 @@ export default function Component() {
           <button className="button verify-button" type="button" onClick={verifyOffChain} disabled={!currentCompiledCircuit}>
             Verify off-chain</button>
         </div>
-        <button className="button verify-button" type="button" onClick={generateAndDeployContract} disabled={!currentCompiledCircuit}> Generate Verifier Contract
+        <button className="button verify-button" type="button" onClick={generateAndDeployContract} disabled={!currentCompiledCircuit || contractAddress}> Generate Verifier Contract
         </button>
 
         <div className="verify-button-container">
-          <button className="button verify-button" type="button" onClick={verifyOnChain} disabled={!isConnected || !currentCompiledCircuit}>
+          <button className="button verify-button" type="button" onClick={verifyOnChain} disabled={!isConnected || !contractAddress}>
             Verify on-chain
           </button>
-
+          {contractAddress && <p className='contract-address'>Contract deployed in address {contractAddress}</p>}
         </div>
       </form>
     </>

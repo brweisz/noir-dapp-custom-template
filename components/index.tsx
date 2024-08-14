@@ -14,7 +14,7 @@ import { ultraVerifierAbi } from '../hooks/verifierContractABI.ts';
 
 export default function Component() {
 
-  let { isConnected, connectDisconnectButton } = useOnChainVerification();
+  let { isConnected, connectDisconnectButton, address } = useOnChainVerification();
 
   const [backend, setBackend] = useState();
   let [provingArgs, setProvingArgs] = useState();
@@ -26,9 +26,9 @@ export default function Component() {
     abi: ultraVerifierAbi,
     address: contractAddress,
     functionName: 'verify',
+    account: address, // Not working
   })
   const { data, error } = useReadUltraVerifierVerify({args, query: {enabled: !!args}});
-
 
   const verifyOnChain = async function() {
     console.log("Verifying on chain")
@@ -186,10 +186,10 @@ export default function Component() {
         </button>
 
         <div className="verify-button-container">
-          <button className="button verify-button" type="button" onClick={verifyOnChain} disabled={!isConnected || !contractAddress}>
+          {contractAddress && <p className='contract-address'>Contract deployed in address {contractAddress}</p>}
+          <button className="button verify-button" type="button" onClick={verifyOnChain} disabled={!contractAddress || !isConnected}>
             Verify on-chain
           </button>
-          {contractAddress && <p className='contract-address'>Contract deployed in address {contractAddress}</p>}
         </div>
       </form>
     </>

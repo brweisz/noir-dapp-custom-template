@@ -5,7 +5,7 @@ import deployment from '../artifacts/deployment.json';
 export function useOnChainVerification() {
   const { connect, connectors } = useConnect();
   const { disconnect } = useDisconnect();
-  const { isConnected } = useAccount();
+  const { isConnected, address } = useAccount();
   const { chains, switchChain } = useSwitchChain();
 
   useEffect(() => {
@@ -29,5 +29,5 @@ export function useOnChainVerification() {
       </div>
     );
 
-  return {isConnected, connectDisconnectButton}
+  return {isConnected, address, connectDisconnectButton}
 }

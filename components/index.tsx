@@ -20,7 +20,7 @@ export default function Component() {
   let [provingArgs, setProvingArgs] = useState();
   const [currentCompiledCircuit, setCurrentCompiledCircuit] = useState();
 
-  let [contractAddress, setContractAddress] = useState(undefined);
+  let [contractAddress, setContractAddress] = useState();
   const [args, setArgs] = useState();
   let useReadUltraVerifierVerify = createUseReadContract({
     abi: ultraVerifierAbi,
@@ -92,21 +92,6 @@ export default function Component() {
     }
   };
 
-  /*useEffect(() => {
-    if (data) {
-      toast.success( 'Proof verified on-chain!', {
-        isLoading: false,
-        autoClose: 5000
-      })
-    } else if (error) {
-      toast.error(`Failed proof verification on-chain: ${error}`, {
-        isLoading: false,
-        autoClose: 5000
-      });
-    }
-    setArgs(undefined)
-  }, [data, error]);*/
-
   const verifyOffChain = async function(){
     await toast.promise(backend.verifyProof(provingArgs), {
       pending: 'Verifying proof off-chain',
@@ -139,6 +124,7 @@ export default function Component() {
     console.log("Deploying")
     if (!currentCompiledCircuit) {
       console.log("Cannot generate contract because no circuit was provided")
+      return;
     }
     let contractSourceCode = await generateVerifierContract(currentCompiledCircuit)
     console.log("Contract successfully created")

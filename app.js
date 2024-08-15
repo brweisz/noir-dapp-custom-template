@@ -16,7 +16,6 @@ async function compileContract(contractSourceCode){
   console.log("Writing file")
   // Save contract source code
   const filePath = path.join(__dirname, '/artifacts/SolidityVerifier.sol');
-  console.log(filePath)
   writeFileSync(filePath, contractSourceCode, (err) => {
     if (err) {
       console.error('Error writing to file:', err)
@@ -36,6 +35,33 @@ async function compileContract(contractSourceCode){
 async function deployCompiledContract() {
   await hardhat.run("deploy")
 }
+
+app.post("/compile-circuit-and-generate-proof", async (req, res) => {
+  let noirSourceCode = req.get("noirSourceCode");
+  let inputs = req.get("inputs");
+  let response = { object: undefined, errors: [] };
+
+  try {
+    // Write noir source code to file
+    console.log("Writing file")
+    const filePath = path.join(__dirname, '/artifacts/main.nr');
+
+    writeFileSync(filePath, noirSourceCode, (err) => {
+      if (err) {console.error('Error writing to file:', err)} else console.log('File written successfully!')})
+
+    // The command should write the compiled circuit to a file (to use it later) and return the file and the proof
+    // The compiled circuit is binary + abi
+    let { proof, compiledCircuit } = await hardhat.run("generate-proof", {
+      noirSourceCode,
+      inputs
+    });
+    response.object = { proof };
+  } catch (e) {
+    console.log(e);
+    response.errors.push(e.message);
+  }
+
+});
 
 app.post("/compile-and-deploy-contract", async (req, res) => {
   let response = { object: undefined, errors: [] }

@@ -26,7 +26,6 @@ export default function Component() {
     abi: ultraVerifierAbi,
     address: contractAddress,
     functionName: 'verify',
-    account: address, // Not working
   })
   const { data, error } = useReadUltraVerifierVerify({args, query: {enabled: !!args}});
 

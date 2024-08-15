@@ -1,43 +1,27 @@
-# Noir with Vite and Hardhat
+# noir-dapp-custom-template
+1. Install dependencies:
+```bash
+nvm use 20.10.0
+```
+```bash
+bun i # "npm i" or "yarn"
+```
 
-[![Netlify Status](https://api.netlify.com/api/v1/badges/e4bd1ebc-6be1-4ed2-8be8-18f70382ae22/deploy-status)](https://app.netlify.com/sites/noir-vite-hardhat/deploys)
+2. Running the app. In different terminals execute the following commands:
 
-This example uses [Vite](https://vite.dev/) as the frontend framework, and
-[Hardhat](https://hardhat.org/) to deploy and test.
-
-## Getting Started
-
-Want to get started in a pinch? Start your project in a free Github Codespace!
-
-[![Start your project in a free Github Codespace!](https://github.com/codespaces/badge.svg)](https://codespaces.new/noir-lang/noir-starter/tree/main)
-
-## Locally
-
-1. Install your favorite package manager. We'll use [bun](https://bun.sh/docs/installation) but feel
-   free to use `yarn` or others:
-
-   ```bash
-   curl -fsSL https://bun.sh/install | bash
-   ```
-
-2. Install dependencies:
-
-   ```bash
-   bun i # "npm i" or "yarn"
-   ```
-
-3. Run the app
-
-You can run a separate Ethereum node from the dev environment:
-
+run a separate Ethereum node from the dev environment:
 ```bash
 bunx hardhat node
 ```
 
-and run the dev environment separately:
-
+run the server environment:
 ```bash
-bunx hardhat dev
+node --watch app.js
+```
+
+run the frontend environment:
+```bash
+vite dev
 ```
 
 ### Testing

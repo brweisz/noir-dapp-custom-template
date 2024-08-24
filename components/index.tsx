@@ -11,11 +11,12 @@ import { bytesToHex } from 'viem';
 import { generateVerifierContract } from './contract.js';
 import { createUseReadContract } from 'wagmi/codegen';
 import { ultraVerifierAbi } from '../hooks/verifierContractABI.ts';
+import Switch from 'react-switch'
 
 export default function Component() {
 
   let { isConnected, connectDisconnectButton, address } = useOnChainVerification();
-
+  let [proveOnServer, setProveOnServer] = useState(false);
   const [backend, setBackend] = useState();
   let [provingArgs, setProvingArgs] = useState();
   const [currentCompiledCircuit, setCurrentCompiledCircuit] = useState();
@@ -40,7 +41,6 @@ export default function Component() {
     const compiledCircuit = await compileCircuit(inputs.noir_program);
     const barretenbergBackend = new BarretenbergBackend(compiledCircuit, { threads: navigator.hardwareConcurrency });
     const noir = new Noir(compiledCircuit);
-    deactivateSpinner();
 
     await toast.promise(noir.init, {
       pending: 'Initializing Noir...',
@@ -85,11 +85,17 @@ export default function Component() {
   };
 
   const submit = async (e: React.FormEvent<HTMLFormElement>) => {
-    try {
-      await _submit(e);
+    /*try {
+      await _submit(e); //TODO: not synchronous
     } catch {
       deactivateSpinner();
-    }
+    }*/
+    // the same as above but asynchronous?
+    e.preventDefault();
+    activateSpinner();
+    _submit(e).then(() => {}).catch(() => {}).finally(() => {
+      deactivateSpinner();
+    });
   };
 
   const verifyOffChain = async function(){
@@ -101,9 +107,6 @@ export default function Component() {
   }
 
   const _submit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    activateSpinner();
-
     const elements = e.currentTarget.elements;
     if (!elements) return;
 
@@ -155,26 +158,43 @@ export default function Component() {
         {connectDisconnectButton}
         <h4>Write you own noir circuit with <i>x</i> and <i>y</i> as input names</h4>
         <p>main.nr</p>
-        <textarea className="program" name="noir_program" required={true}/>
+        <textarea className="program" name="noir_program" required={true} />
         <p>Try it!</p>
         <div className="inputs">
-          <input className="text-input" name="x" type="text" placeholder="x" required={true}/>
-          <input className="text-input" name="y" type="text" placeholder="y" required={true}/>
+          <input className="text-input" name="x" type="text" placeholder="x" required={true} />
+          <input className="text-input" name="y" type="text" placeholder="y" required={true} />
         </div>
-        <div className="generate-proof-button-container">
+        <div className="prove-options">
+          <div className="prove-server-options">
+            <p>On browser</p>
+            <Switch onChange={(checked) => setProveOnServer(checked)} checked={proveOnServer} />
+            <p>On server</p>
+          </div>
           <button className="button prove-button" type="submit" id="submit">Calculate proof</button>
           <div className="spinner-button" id="spinner"></div>
-          <button className="button verify-button" type="button" onClick={verifyOffChain} disabled={!currentCompiledCircuit}>
-            Verify off-chain</button>
         </div>
-        <button className="button verify-button" type="button" onClick={generateAndDeployContract} disabled={!currentCompiledCircuit || contractAddress}> Generate Verifier Contract
-        </button>
+        <div className="actions-section">
+        <div className="column-workflow">
 
-        <div className="verify-button-container">
-          {contractAddress && <p className='contract-address'>Contract deployed in address {contractAddress}</p>}
-          <button className="button verify-button" type="button" onClick={verifyOnChain} disabled={!contractAddress || !isConnected}>
-            Verify on-chain
-          </button>
+            <button className="button verify-button" type="button" onClick={verifyOffChain}
+                    disabled={!currentCompiledCircuit}>
+              Verify off-chain
+            </button>
+          </div>
+          <div className="column-workflow">
+            <button className="button verify-button" type="button" onClick={generateAndDeployContract}
+                    disabled={!currentCompiledCircuit || contractAddress}> Generate Verifier Contract
+            </button>
+
+            <div className="verify-button-container">
+              {contractAddress && <p className='contract-address'>Contract deployed in address {contractAddress}</p>}
+              <button className="button verify-button" type="button" onClick={verifyOnChain}
+                      disabled={!contractAddress || !isConnected}>
+                Verify on-chain
+              </button>
+            </div>
+          </div>
+
         </div>
       </form>
     </>

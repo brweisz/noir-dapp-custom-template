@@ -122,8 +122,14 @@ textarea:focus, input:focus {
   width: 200px;
 }
 
-.generate-proof-button-container {
+.actions-section {
   display: flex;
+  gap: 20px;
+}
+
+.column-workflow {
+  display: flex;
+  flex-direction: column;
   gap: 30px;
 }
 
@@ -162,4 +168,18 @@ textarea:focus, input:focus {
 
 .contract-address {
   font-size: 10px;
+}
+
+.prove-options {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.prove-server-options{
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 20px;
 }

@@ -151,6 +151,10 @@ export default function Component() {
     return contractAddress
   };
 
+  const defaultCode = function(){
+    return `fn main(x: Field, y:Field){ \n assert(x==y); \n }`
+  }
+
   return (
     <>
       <form className="container" onSubmit={submit}>
@@ -158,7 +162,7 @@ export default function Component() {
         {connectDisconnectButton}
         <h4>Write you own noir circuit with <i>x</i> and <i>y</i> as input names</h4>
         <p>main.nr</p>
-        <textarea className="program" name="noir_program" required={true} />
+        <textarea className="program" name="noir_program" required={true} defaultValue={defaultCode()}/>
         <p>Try it!</p>
         <div className="inputs">
           <input className="text-input" name="x" type="text" placeholder="x" required={true} />

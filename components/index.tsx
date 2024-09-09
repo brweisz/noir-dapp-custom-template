@@ -235,7 +235,7 @@ export default function Component() {
             <div className="verify-button-container">
               {contractAddress && <p className='contract-address'>Contract deployed in address {contractAddress}</p>}
               <button className="button verify-button" type="button" onClick={verifyOnChain}
-                      disabled={!contractAddress || !isConnected}>
+                      disabled={!contractAddress}>
                 Verify on-chain
               </button>
             </div>

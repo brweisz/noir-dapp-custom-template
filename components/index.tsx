@@ -7,34 +7,46 @@ import { compileCircuit } from '../circuit/compile.js';
 import { BarretenbergBackend } from '@noir-lang/backend_barretenberg';
 import { Noir } from '@noir-lang/noir_js';
 import { toast } from 'react-toastify';
-import { bytesToHex } from 'viem';
 import { generateVerifierContract } from './contract.js';
 import { createUseReadContract } from 'wagmi/codegen';
 import { ultraVerifierAbi } from '../hooks/verifierContractABI.ts';
 import Switch from 'react-switch';
+import { ethers } from 'ethers';
 
 export default function Component() {
 
   let [inputNames, setInputNames] = useState(["x", "y"])
   let { isConnected, connectDisconnectButton, address } = useOnChainVerification();
-  let [proveOnServer, setProveOnServer] = useState(false);
   const [backend, setBackend] = useState();
   let [provingArgs, setProvingArgs] = useState();
   const [currentCompiledCircuit, setCurrentCompiledCircuit] = useState();
+  let [proveOnServer, setProveOnServer] = useState(false);
 
   let [contractAddress, setContractAddress] = useState();
-  const [args, setArgs] = useState();
-  let useReadUltraVerifierVerify = createUseReadContract({
-    abi: ultraVerifierAbi,
-    address: contractAddress,
-    functionName: 'verify',
-  })
-  const { data, error } = useReadUltraVerifierVerify({args, query: {enabled: !!args}});
+
+  const bytesToHex = function(arrayOfBytes: Uint8Array){
+    return "0x"+Array.from(arrayOfBytes)
+      .map(byte => byte.toString(16).padStart(2, '0'))
+      .join('');
+  }
 
   const verifyOnChain = async function() {
-    console.log("Verifying on chain")
-    setArgs([bytesToHex(provingArgs.proof), provingArgs.publicInputs as `0x${string}`[]]);
-    setTimeout(()=> setArgs(undefined), 1000)}
+    if (typeof window.ethereum == null) alert('MetaMask is not installed!');
+
+    try {
+      await window.ethereum.request({ method: 'eth_requestAccounts' });
+      const provider = new ethers.BrowserProvider(window.ethereum)
+      const signer = await provider.getSigner();
+      const contract = new ethers.Contract(contractAddress, ultraVerifierAbi, signer);
+      let proofToSend = bytesToHex(provingArgs.proof)
+      let publicInputsToSend = provingArgs.publicInputs as `0x${string}`[]
+      const transaction = await contract.verify(proofToSend, publicInputsToSend);
+
+      console.log("Transaction successful:", transaction);
+    } catch (error) {
+      console.error("Error making transaction:", error);
+    }
+  }
 
   const generateProof = async (inputs: any, noirProgram: any) => {
     if (!inputs) return;

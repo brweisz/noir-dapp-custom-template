@@ -169,12 +169,13 @@ export default function Component() {
 
   const updateProgramSourceCode = function(e){
     let inputNames = _extractInputNames(e.target.value)
+    let textarea = document.getElementById("noir-program")
     if (new Set(inputNames).size !== inputNames.length) {
-      console.log("Inputs repetidos!!!")
+      textarea.classList.add("multiple-inputs-error")
     } else {
+      textarea.classList.remove("multiple-inputs-error")
       setInputNames(inputNames)
     }
-
   }
 
   return (
@@ -184,7 +185,7 @@ export default function Component() {
         {connectDisconnectButton}
         <h4>Write you own <i>Noir</i> circuit </h4>
         <p>main.nr</p>
-        <textarea className="program" name="noir_program"
+        <textarea className="program" name="noir_program" id="noir-program"
                   required={true}
                   defaultValue={defaultCode()}
                   onChange={updateProgramSourceCode}

@@ -127,6 +127,11 @@ textarea:focus, input:focus {
   gap: 20px;
 }
 
+.multiple-inputs-error {
+  border-color: red;
+  background-color: rgba(234, 100, 77, 0.32);
+}
+
 .column-workflow {
   display: flex;
   flex-direction: column;

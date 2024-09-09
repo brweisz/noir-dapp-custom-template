@@ -118,8 +118,6 @@ export default function Component() {
     }, {})
 
     const noirProgram = elements.namedItem('noir_program') as HTMLInputElement;
-
-    console.log(inputs)
     await generateProof(inputs, noirProgram.value);
   };
 

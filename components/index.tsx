@@ -36,10 +36,10 @@ export default function Component() {
     setArgs([bytesToHex(provingArgs.proof), provingArgs.publicInputs as `0x${string}`[]]);
     setTimeout(()=> setArgs(undefined), 1000)}
 
-  const generateProof = async (inputs: any) => {
+  const generateProof = async (inputs: any, noirProgram: any) => {
     if (!inputs) return;
 
-    const compiledCircuit = await compileCircuit(inputs.noir_program);
+    const compiledCircuit = await compileCircuit(noirProgram);
     const barretenbergBackend = new BarretenbergBackend(compiledCircuit, { threads: navigator.hardwareConcurrency });
     const noir = new Noir(compiledCircuit);
 
@@ -111,17 +111,16 @@ export default function Component() {
     const elements = e.currentTarget.elements;
     if (!elements) return;
 
-    const x = elements.namedItem('x') as HTMLInputElement;
-    const y = elements.namedItem('y') as HTMLInputElement;
-    const noir_program = elements.namedItem('noir_program') as HTMLInputElement;
+    let inputElements = Array.from(elements).filter(el => el.tagName == "INPUT" && el.type === 'text')
+    let inputs = inputElements.reduce((acc, current) => {
+      acc[current.name] = current.value;
+      return acc
+    }, {})
 
-    let inputs = {
-      x: x.value,
-      y: y.value,
-      noir_program: noir_program.value,
-    };
+    const noirProgram = elements.namedItem('noir_program') as HTMLInputElement;
 
-    await generateProof(inputs);
+    console.log(inputs)
+    await generateProof(inputs, noirProgram.value);
   };
 
   async function generateAndDeployContract(){

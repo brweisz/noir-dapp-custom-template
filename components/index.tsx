@@ -155,14 +155,30 @@ export default function Component() {
     return `fn main(x: Field, y:Field){ \n assert(x==y); \n }`
   }
 
+  const updateProgramSourceCode = function(e){
+    let programSourceCode = e.target.value;
+    let firstLine = programSourceCode.split("\n")[0]
+    let parts = firstLine.split(":")
+    let inputNames = []
+    for(let i = 0; i < parts.length - 1; i++){
+      let partSplitted = parts[i].split(new RegExp("[ (]", 'g'))
+      inputNames.push(partSplitted[partSplitted.length - 1])
+    }
+    console.log(inputNames)
+  }
+
   return (
     <>
       <form className="container" onSubmit={submit}>
         <h2>Noir <span className="funky-typography">Playground</span></h2>
         {connectDisconnectButton}
-        <h4>Write you own noir circuit with <i>x</i> and <i>y</i> as input names</h4>
+        <h4>Write you own <i>Noir</i> circuit </h4>
         <p>main.nr</p>
-        <textarea className="program" name="noir_program" required={true} defaultValue={defaultCode()}/>
+        <textarea className="program" name="noir_program"
+                  required={true}
+                  defaultValue={defaultCode()}
+                  onChange={updateProgramSourceCode}
+        />
         <p>Try it!</p>
         <div className="inputs">
           <input className="text-input" name="x" type="text" placeholder="x" required={true} />

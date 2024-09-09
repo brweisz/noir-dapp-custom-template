@@ -11,10 +11,11 @@ import { bytesToHex } from 'viem';
 import { generateVerifierContract } from './contract.js';
 import { createUseReadContract } from 'wagmi/codegen';
 import { ultraVerifierAbi } from '../hooks/verifierContractABI.ts';
-import Switch from 'react-switch'
+import Switch from 'react-switch';
 
 export default function Component() {
 
+  let [inputNames, setInputNames] = useState(["x", "y"])
   let { isConnected, connectDisconnectButton, address } = useOnChainVerification();
   let [proveOnServer, setProveOnServer] = useState(false);
   const [backend, setBackend] = useState();
@@ -155,8 +156,7 @@ export default function Component() {
     return `fn main(x: Field, y:Field){ \n assert(x==y); \n }`
   }
 
-  const updateProgramSourceCode = function(e){
-    let programSourceCode = e.target.value;
+  const _extractInputNames = function(programSourceCode){
     let firstLine = programSourceCode.split("\n")[0]
     let parts = firstLine.split(":")
     let inputNames = []
@@ -164,7 +164,17 @@ export default function Component() {
       let partSplitted = parts[i].split(new RegExp("[ (]", 'g'))
       inputNames.push(partSplitted[partSplitted.length - 1])
     }
-    console.log(inputNames)
+    return inputNames
+  }
+
+  const updateProgramSourceCode = function(e){
+    let inputNames = _extractInputNames(e.target.value)
+    if (new Set(inputNames).size !== inputNames.length) {
+      console.log("Inputs repetidos!!!")
+    } else {
+      setInputNames(inputNames)
+    }
+
   }
 
   return (
@@ -181,9 +191,15 @@ export default function Component() {
         />
         <p>Try it!</p>
         <div className="inputs">
-          <input className="text-input" name="x" type="text" placeholder="x" required={true} />
-          <input className="text-input" name="y" type="text" placeholder="y" required={true} />
+          {inputNames.map(inputName => {
+            return <input className="text-input"
+                          name={`${inputName}`}
+                          type="text" placeholder={`${inputName}`}
+                          required={true}
+                          key={`${inputName}`} />;
+          })}
         </div>
+
         <div className="prove-options">
           <div className="prove-server-options">
             <p>On browser</p>

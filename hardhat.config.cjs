@@ -87,15 +87,8 @@ task('node', 'Runs a local blockchain').setAction(async (_, hre, runSuper) => {
 })
 
 task('deploy', 'Deploys the verifier contract')
-  .addOptionalParam('attach', 'Attach to an existing address', '', types.string)
-  .setAction(async ({ attach }, hre) => {
-    let verifier;
-    if (attach) {
-      verifier = await hre.viem.getContractAt('UltraVerifier', attach);
-    } else {
-      verifier = await hre.viem.deployContract('UltraVerifier');
-    }
-
+  .setAction(async (/*{ attach }*/_, hre) => {
+    let verifier = await hre.viem.deployContract('UltraVerifier');
     const networkConfig = (await import(`viem/chains`))[hre.network.name];
     console.log(networkConfig);
     const config = {

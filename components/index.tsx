@@ -231,16 +231,12 @@ export default function Component() {
             <button className="button verify-button" type="button" onClick={generateAndDeployContract}
                     disabled={!currentCompiledCircuit || contractAddress}> Generate Verifier Contract
             </button>
-
-            <div className="verify-button-container">
-              {contractAddress && <p className='contract-address'>Contract deployed in address {contractAddress}</p>}
-              <button className="button verify-button" type="button" onClick={verifyOnChain}
-                      disabled={!contractAddress}>
-                Verify on-chain
-              </button>
-            </div>
+            {contractAddress && <p className='contract-address'>Contract deployed in address {contractAddress}</p>}
+            <button className="button verify-button" type="button" onClick={verifyOnChain}
+                    disabled={!contractAddress}>
+              Verify on-chain
+            </button>
           </div>
-
         </div>
       </form>
     </>

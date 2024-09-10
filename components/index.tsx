@@ -239,7 +239,8 @@ export default function Component() {
           </div>
           <div className="column-workflow">
             <button className="button verify-button" type="button" onClick={generateAndDeployContract}
-                    disabled={!currentCompiledCircuit || contractAddress}> Generate Verifier Contract
+                    disabled={!currentCompiledCircuit}>
+              {contractAddress ? "Re-Generate Verifier Contract": "Generate Verifier Contract"}
             </button>
             {contractAddress && <p className='contract-address'>Contract deployed in address {contractAddress}</p>}
             <button className="button verify-button" type="button" onClick={verifyOnChain}

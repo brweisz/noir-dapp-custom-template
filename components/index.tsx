@@ -8,7 +8,6 @@ import { BarretenbergBackend } from '@noir-lang/backend_barretenberg';
 import { Noir } from '@noir-lang/noir_js';
 import { toast } from 'react-toastify';
 import { generateVerifierContract } from './contract.js';
-import { createUseReadContract } from 'wagmi/codegen';
 import { ultraVerifierAbi } from '../hooks/verifierContractABI.ts';
 import Switch from 'react-switch';
 import { ethers } from 'ethers';
@@ -56,13 +55,9 @@ export default function Component() {
     });
   }
 
-  const generateProof = async (inputs: any, noirProgram: any) => {
-    if (!inputs) return;
+  const generateProof = async (inputs: any) => {
 
-    const compiledCircuit = await compileCircuit(noirProgram);
-    const barretenbergBackend = new BarretenbergBackend(compiledCircuit, { threads: navigator.hardwareConcurrency });
-    const noir = new Noir(compiledCircuit);
-
+    const noir = new Noir(currentCompiledCircuit);
     await toast.promise(noir.init, {
       pending: 'Initializing Noir...',
       success: 'Noir initialized!',
@@ -74,8 +69,10 @@ export default function Component() {
       success: 'Witness generated',
       error: 'Error generating witness',
     });
+
     if (!witness) return;
 
+    const barretenbergBackend = new BarretenbergBackend(currentCompiledCircuit, { threads: navigator.hardwareConcurrency });
     const proofData = await toast.promise(barretenbergBackend.generateProof(witness), {
       pending: 'Generating proof',
       success: 'Proof generated',
@@ -84,7 +81,6 @@ export default function Component() {
     if (!proofData) return;
     setProvingArgs(proofData)
     setBackend(barretenbergBackend)
-    setCurrentCompiledCircuit(compiledCircuit)
   };
 
   const getSpinnerElements = () => {
@@ -127,10 +123,22 @@ export default function Component() {
     });
   }
 
+  const _generateCircuit = async function(noirProgram: any){
+    const compiledCircuit = await compileCircuit(noirProgram);
+    setCurrentCompiledCircuit(compiledCircuit)
+  }
+
+  const generateCircuit = async function(e){
+    let noirProgram = e.target.form.elements['noir_program'].value
+    await toast.promise(_generateCircuit(noirProgram), {
+      pending: 'Compiling circuit...',
+      success: 'Circuit compiled',
+      error: 'Error compiling circuit',
+    });
+  }
+
   const _submit = async (e: React.FormEvent<HTMLFormElement>) => {
     const elements = e.currentTarget.elements;
-    if (!elements) return;
-
     let inputElements = Array.from(elements).filter(el => el.tagName == "INPUT" && el.type === 'text')
     let inputs = inputElements.reduce((acc, current) => {
       acc[current.name] = current.value;
@@ -142,7 +150,6 @@ export default function Component() {
   };
 
   async function generateAndDeployContract(){
-    console.log("Deploying")
     let contractSourceCode = await toast.promise(generateVerifierContract(currentCompiledCircuit), {
       pending: 'Generating verifier contract on browser...',
       success: 'Verifier contract generated',
@@ -210,7 +217,9 @@ export default function Component() {
                   defaultValue={defaultCode()}
                   onChange={updateProgramSourceCode}
         />
-        <p>Try it!</p>
+        <button className="button prove-button" type="button" onClick={generateCircuit}>
+          Generate circuit</button>
+        <p>Try providing some inputs to generate a proof!</p>
         <div className="inputs">
           {inputNames.map(inputName => {
             return <input className="text-input"
@@ -233,8 +242,7 @@ export default function Component() {
           </div>
         </div>
         <div className="actions-section">
-        <div className="column-workflow">
-
+          <div className="column-workflow">
             <button className="button verify-button" type="button" onClick={verifyOffChain}
                     disabled={!currentCompiledCircuit}>
               Verify off-chain
@@ -243,7 +251,7 @@ export default function Component() {
           <div className="column-workflow">
             <button className="button verify-button" type="button" onClick={generateAndDeployContract}
                     disabled={!currentCompiledCircuit}>
-              {contractAddress ? "Re-Generate Verifier Contract": "Generate Verifier Contract"}
+              {contractAddress ? "Re-Generate Verifier Contract" : "Generate Verifier Contract"}
             </button>
             {contractAddress && <p className='contract-address'>Contract deployed in address {contractAddress}</p>}
             <button className="button verify-button" type="button" onClick={verifyOnChain}

@@ -15,6 +15,7 @@ import { ethers } from 'ethers';
 export default function Component() {
 
   let [inputNames, setInputNames] = useState(["x", "y"])
+  let [sourceCodeError, setSourceCodeError] = useState("")
   let { isConnected, connectDisconnectButton, address } = useOnChainVerification();
   const [backend, setBackend] = useState();
   let [provingArgs, setProvingArgs] = useState();
@@ -118,8 +119,12 @@ export default function Component() {
   }
 
   const _generateCircuit = async function(noirProgram: any){
-    const compiledCircuit = await compileCircuit(noirProgram);
-    setCurrentCompiledCircuit(compiledCircuit)
+    compileCircuit(noirProgram)
+      .then(compiledCircuit => {
+        setSourceCodeError("");
+        setCurrentCompiledCircuit(compiledCircuit);
+      })
+      .catch(error => setSourceCodeError(error.message))
   }
 
   const generateCircuit = async function(e){
@@ -211,6 +216,7 @@ export default function Component() {
                   defaultValue={defaultCode()}
                   onChange={updateProgramSourceCode}
         />
+        {sourceCodeError && <p className="error-message">Error: {sourceCodeError}</p>}
         <button className="button prove-button" type="button" onClick={generateCircuit}>
           Generate circuit</button>
         <p>Try providing some inputs to generate a proof!</p>

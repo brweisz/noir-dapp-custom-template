@@ -38,13 +38,13 @@ function defaultNargoToml(){
 
 export async function compileCircuit(noirProgram: string) {
   const fm = createFileManager('/');
-  // const nargoToml = (await fetch(new URL(`./Nargo.toml`, import.meta.url)))
-  //   .body as ReadableStream<Uint8Array>;
   await fm.writeFile('./src/main.nr', stringToStream(noirProgram));
   await fm.writeFile('./Nargo.toml', stringToStream(defaultNargoToml()));
-  const result = await compile(fm);
-  if (!('program' in result)) {
-    throw new Error('Compilation failed');
+  try {
+    const result = await compile(fm);
+    return result.program as CompiledCircuit;
+  } catch(e){
+    throw new Error("Compilation failed: " + e)
+
   }
-  return result.program as CompiledCircuit;
 }

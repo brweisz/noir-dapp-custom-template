@@ -102,12 +102,6 @@ export default function Component() {
   };
 
   const submit = async (e: React.FormEvent<HTMLFormElement>) => {
-    /*try {
-      await _submit(e); //TODO: not synchronous
-    } catch {
-      deactivateSpinner();
-    }*/
-    // the same as above but asynchronous?
     e.preventDefault();
     activateSpinner();
     _submit(e).then(() => {}).catch(() => {}).finally(() => {

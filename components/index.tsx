@@ -30,7 +30,7 @@ export default function Component() {
       .join('');
   }
 
-  const verifyOnChain = async function() {
+  const _verifyOnChain = async function() {
     if (typeof window.ethereum == null) alert('MetaMask is not installed!');
 
     try {
@@ -46,6 +46,14 @@ export default function Component() {
     } catch (error) {
       console.error("Error making transaction:", error);
     }
+  }
+
+  const verifyOnChain = async function(){
+    await toast.promise(_verifyOnChain(), {
+      pending: 'Verifying proof on-chain',
+      success: 'Proof verified on-chain',
+      error: 'Error verifying proof on-chain',
+    });
   }
 
   const generateProof = async (inputs: any, noirProgram: any) => {

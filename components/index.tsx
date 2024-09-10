@@ -224,8 +224,10 @@ export default function Component() {
             <Switch onChange={(checked) => setProveOnServer(checked)} checked={proveOnServer} />
             <p>On server</p>
           </div>
-          <button className="button prove-button" type="submit" id="submit">Calculate proof</button>
-          <div className="spinner-button" id="spinner"></div>
+          <div style={{ display: 'flex' }}>
+            <button className="button prove-button" type="submit" id="submit">Calculate proof</button>
+            <div className="spinner-button" id="spinner"></div>
+          </div>
         </div>
         <div className="actions-section">
         <div className="column-workflow">

@@ -198,8 +198,8 @@ export default function Component() {
   return (
     <>
       <form className="container" onSubmit={submit}>
+        <div className="header">{connectDisconnectButton}</div>
         <h2>Noir <span className="funky-typography">Playground</span></h2>
-        {connectDisconnectButton}
         <h4>Write you own <i>Noir</i> circuit </h4>
         <p>main.nr</p>
         <textarea className="program" name="noir_program" id="noir-program"

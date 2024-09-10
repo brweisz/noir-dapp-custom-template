@@ -27,13 +27,21 @@ async function streamToString(stream: ReadableStream<Uint8Array>): Promise<strin
   return result;
 }
 
+function defaultNargoToml(){
+  return `[package]
+  name = "noirPlayground"
+  type = "bin"
+
+  [dependencies]
+  `
+}
+
 export async function compileCircuit(noirProgram: string) {
   const fm = createFileManager('/');
-  const nargoToml = (await fetch(new URL(`./Nargo.toml`, import.meta.url)))
-    .body as ReadableStream<Uint8Array>;
-
+  // const nargoToml = (await fetch(new URL(`./Nargo.toml`, import.meta.url)))
+  //   .body as ReadableStream<Uint8Array>;
   await fm.writeFile('./src/main.nr', stringToStream(noirProgram));
-  await fm.writeFile('./Nargo.toml', nargoToml);
+  await fm.writeFile('./Nargo.toml', stringToStream(defaultNargoToml()));
   const result = await compile(fm);
   if (!('program' in result)) {
     throw new Error('Compilation failed');

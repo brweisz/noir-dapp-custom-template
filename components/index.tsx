@@ -143,14 +143,17 @@ export default function Component() {
 
   async function generateAndDeployContract(){
     console.log("Deploying")
-    if (!currentCompiledCircuit) {
-      console.log("Cannot generate contract because no circuit was provided")
-      return;
-    }
-    let contractSourceCode = await generateVerifierContract(currentCompiledCircuit)
-    console.log("Contract successfully created")
-    console.log("Compiling and deploying contract")
-    let address = await compileAndDeploy(contractSourceCode)
+    let contractSourceCode = await toast.promise(generateVerifierContract(currentCompiledCircuit), {
+      pending: 'Generating verifier contract on browser...',
+      success: 'Verifier contract generated',
+      error: 'Error generating verifier contract',
+    });
+    let address = await toast.promise(compileAndDeploy(contractSourceCode), {
+      pending: 'Compiling and deploying contract on server...',
+      success: 'Verifier contract deployed',
+      error: 'Error deploying verifier contract',
+    });
+
     setContractAddress(address)
   }
 

@@ -28,7 +28,22 @@ subtask(TASK_COMPILE_SOLIDITY).setAction(async (_, { config }, runSuper) => {
   return superRes;
 });
 
-async function compileCircuit(path = './circuit') {
+task('node', 'Runs a local blockchain').setAction(async (_, hre, runSuper) => {
+  console.log("Starting network...")
+  const networkConfig = (await import(`viem/chains`))[hre.network.name];
+  const config = {
+    name: hre.network.name,
+    networkConfig: {
+      ...networkConfig,
+      id: hre.network.config.chainId || networkConfig.id,
+    },
+  };
+  mkdirSync('artifacts', { recursive: true });
+  writeFileSync('artifacts/deployment.json', JSON.stringify(config), { flag: 'w' });
+  await runSuper();
+})
+
+/*async function compileCircuit(path = './circuit') {
   const basePath = resolve(join(path));
   const fm = createFileManager(basePath);
   const result = await compile(fm);
@@ -61,33 +76,8 @@ async function generateArtifacts(path = './circuit', crsPath = './crs') {
   return { circuit, contract };
 }
 
-/*task('compile', 'Compile and generate circuits and contracts').setAction(
-  async (_, __, runSuper) => {
-    const { circuit, contract } = await generateArtifacts();
-    // mkdirSync('artifacts', { recursive: true });
-    writeFileSync('artifacts/circuit.json', JSON.stringify(circuit), { flag: 'w' });
-    writeFileSync('artifacts/contract.sol', contract, { flag: 'w' });
-    await runSuper();
-  },
-);*/
-
-task('node', 'Runs a local blockchain').setAction(async (_, hre, runSuper) => {
-  console.log("Starting network...")
-  const networkConfig = (await import(`viem/chains`))[hre.network.name];
-  const config = {
-    name: hre.network.name,
-    networkConfig: {
-      ...networkConfig,
-      id: hre.network.config.chainId || networkConfig.id,
-    },
-  };
-  mkdirSync('artifacts', { recursive: true });
-  writeFileSync('artifacts/deployment.json', JSON.stringify(config), { flag: 'w' });
-  await runSuper();
-})
-
 task('deploy', 'Deploys the verifier contract')
-  .setAction(async (/*{ attach }*/_, hre) => {
+  .setAction(async (/!*{ attach }*!/_, hre) => {
     let verifier = await hre.viem.deployContract('UltraVerifier');
     const networkConfig = (await import(`viem/chains`))[hre.network.name];
     console.log(networkConfig);
@@ -140,6 +130,7 @@ task('build', 'Builds the frontend project')
 task('serve', 'Serves the frontend project').setAction(async (_, hre) => {
   exec('vite preview');
 });
+*/
 
 module.exports = {
   solidity: {

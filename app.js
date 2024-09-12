@@ -3,7 +3,6 @@ import { writeFileSync, readFileSync } from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import hardhat from 'hardhat';
-import { exec } from 'child_process';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -13,8 +12,6 @@ app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
 async function compileContract(contractSourceCode){
-  console.log("Writing file")
-  // Save contract source code
   const filePath = path.join(__dirname, '/artifacts/SolidityVerifier.sol');
   writeFileSync(filePath, contractSourceCode, (err) => {
     if (err) {
@@ -24,17 +21,10 @@ async function compileContract(contractSourceCode){
     }
   })
 
-  // Compile contract
-  console.log("Compiling contract")
   await hardhat.run('compile');
-  console.log("Contract compiled")
 }
 
-async function deployCompiledContract() {
-  await hardhat.run("deploy")
-}
-
-app.post("/compile-circuit-and-generate-proof", async (req, res) => {
+/*app.post("/compile-circuit-and-generate-proof", async (req, res) => {
   let noirSourceCode = req.get("noirSourceCode");
   let inputs = req.get("inputs");
   let response = { object: undefined, errors: [] };
@@ -58,24 +48,7 @@ app.post("/compile-circuit-and-generate-proof", async (req, res) => {
     console.log(e);
     response.errors.push(e.message);
   }
-
-});
-
-app.post("/compile-and-deploy-contract", async (req, res) => {
-  let response = { object: undefined, errors: [] }
-  try {
-    let { contractSourceCode } = req.body;
-    await compileContract(contractSourceCode)
-    await deployCompiledContract()
-    let deployment = await import("./artifacts/deployment_with_address.json", { assert: { type: 'json' } });
-    exec("wagmi generate")
-    response.object = { contractAddress: deployment.default.address }
-  } catch (e) {
-    console.log(e)
-    response.errors.push(e.message)
-  }
-  res.send(response);
-});
+});*/
 
 app.post("/compile-contract", async (req,res) => {
   let response = { object: undefined, errors: [] }

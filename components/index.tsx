@@ -7,9 +7,8 @@ import { compileCircuit } from '../circuit/compile.js';
 import { BarretenbergBackend } from '@noir-lang/backend_barretenberg';
 import { Noir } from '@noir-lang/noir_js';
 import { toast } from 'react-toastify';
-import { generateVerifierContract } from './contract.js';
+import { generateVerifierContract } from './generateVerifierContract.js';
 import { ultraVerifierAbi } from '../hooks/verifierContractABI.ts';
-import Switch from 'react-switch';
 import { ethers } from 'ethers';
 
 export default function Component() {
@@ -254,11 +253,6 @@ export default function Component() {
         </div>
 
         <div className="prove-options">
-          {/*<div className="prove-server-options">
-            <p>On browser</p>
-            <Switch onChange={(checked) => setProveOnServer(checked)} checked={proveOnServer} />
-            <p>On server</p>
-          </div>*/}
           <div style={{ display: 'flex' }}>
             <button className="button prove-button" type="submit" id="submit">Calculate proof</button>
             <div className="spinner-button" id="spinner"></div>

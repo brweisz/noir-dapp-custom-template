@@ -28,7 +28,7 @@ export default function NoirPlayground() {
   let [contractAddress, setContractAddress] = useState();
 
   const verifyOnChain = async function(){
-    await toast.promise(verifyOnChainEthers(), {
+    await toast.promise(verifyOnChainEthers(contractAddress, provingArgs), {
       pending: 'Verifying proof on-chain',
       success: 'Proof verified on-chain',
       error: 'Error verifying proof on-chain',
@@ -123,11 +123,12 @@ export default function NoirPlayground() {
   };
 
   const deployContractOnWeb = async function(){
-    await toast.promise(deployContractEthers(ultraVerifierAbi, contractBytecode), {
+    let address = await toast.promise(deployContractEthers(ultraVerifierAbi, contractBytecode), {
       pending: 'Deploying contract from browser...',
       success: 'Verifier contract deployed',
       error: 'Error deploying verifier contract',
     });
+    setContractAddress(address)
   }
 
   const updateProgramSourceCode = function(e){

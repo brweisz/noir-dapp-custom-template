@@ -14,11 +14,11 @@ export async function deployContractEthers(abi: any, bytecode: string){
   const contract = await factory.deploy();
   await contract.deploymentTransaction().wait();
   let address = await contract.getAddress()
-  setContractAddress(address)
   console.log("Contract deployed at:", address);
+  return address
 }
 
-export async function verifyOnChainEthers() {
+export async function verifyOnChainEthers(contractAddress, provingArgs) {
   if (typeof window.ethereum == null) {alert('MetaMask is not installed!');return;}
   try {
     await window.ethereum.request({ method: 'eth_requestAccounts' });

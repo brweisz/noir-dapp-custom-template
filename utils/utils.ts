@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 export function bytesToHex(arrayOfBytes: Uint8Array){
   return "0x"+Array.from(arrayOfBytes)
     .map(byte => byte.toString(16).padStart(2, '0'))
@@ -13,4 +15,13 @@ export function extractInputNames(programSourceCode: any){
     inputNames.push(partSplitted[partSplitted.length - 1])
   }
   return inputNames
+}
+
+export function extractInputsFromFormElements(elements) {
+  let inputElements = Array.from(elements).filter(el => el.tagName == 'INPUT' && el.type === 'text');
+  let inputs = inputElements.reduce((acc, current) => {
+    acc[current.name] = current.value;
+    return acc;
+  }, {});
+  return { inputs };
 }

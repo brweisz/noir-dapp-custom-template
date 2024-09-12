@@ -10,8 +10,9 @@ import { toast } from 'react-toastify';
 import { generateVerifierContract } from '../utils/generateVerifierContract.js';
 import { ultraVerifierAbi } from '../utils/verifierContractABI.ts';
 import { ethers } from 'ethers';
-import {bytesToHex, extractInputNames} from "../utils/utils.js"
+import {bytesToHex, extractInputNames, extractInputsFromFormElements} from "../utils/utils.js"
 import {postCompileContract} from "../utils/apiClient.js"
+import {deployContractEthers} from "../utils/deploy.js"
 
 export default function Component() {
 
@@ -133,34 +134,14 @@ export default function Component() {
 
   const _submit = async (e: React.FormEvent<HTMLFormElement>) => {
     const elements = e.currentTarget.elements;
-    let inputElements = Array.from(elements).filter(el => el.tagName == "INPUT" && el.type === 'text')
-    let inputs = inputElements.reduce((acc, current) => {
-      acc[current.name] = current.value;
-      return acc
-    }, {})
+    let { inputs } = extractInputsFromFormElements(elements);
 
     const noirProgram = elements.namedItem('noir_program') as HTMLInputElement;
     await generateProof(inputs, noirProgram.value);
   };
 
-
-
-  const _deployContractOnWeb = async function(abi, bytecode){
-    if (typeof window.ethereum === "undefined") {alert("Please install Metamask!");return;}
-    await window.ethereum.request({ method: 'eth_requestAccounts' });
-    const provider = new ethers.BrowserProvider(window.ethereum)
-    const signer = await provider.getSigner();
-    const factory = new ethers.ContractFactory(abi, bytecode, signer);
-
-    const contract = await factory.deploy();
-    await contract.deploymentTransaction().wait();
-    let address = await contract.getAddress()
-    setContractAddress(address)
-    console.log("Contract deployed at:", address);
-  }
-
   const deployContractOnWeb = async function(){
-    await toast.promise(_deployContractOnWeb(ultraVerifierAbi, contractBytecode), {
+    await toast.promise(deployContractEthers(ultraVerifierAbi, contractBytecode), {
       pending: 'Deploying contract from browser...',
       success: 'Verifier contract deployed',
       error: 'Error deploying verifier contract',

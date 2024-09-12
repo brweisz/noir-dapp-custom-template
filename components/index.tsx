@@ -10,6 +10,7 @@ import { toast } from 'react-toastify';
 import { generateVerifierContract } from '../utils/generateVerifierContract.js';
 import { ultraVerifierAbi } from '../utils/verifierContractABI.ts';
 import { ethers } from 'ethers';
+import {bytesToHex} from "../utils/utils.js"
 
 export default function Component() {
 
@@ -21,15 +22,8 @@ export default function Component() {
   const [backend, setBackend] = useState();
   let [provingArgs, setProvingArgs] = useState();
   const [currentCompiledCircuit, setCurrentCompiledCircuit] = useState();
-  let [deployOnServer, setDeployOnServer] = useState(false);
 
   let [contractAddress, setContractAddress] = useState();
-
-  const bytesToHex = function(arrayOfBytes: Uint8Array){
-    return "0x"+Array.from(arrayOfBytes)
-      .map(byte => byte.toString(16).padStart(2, '0'))
-      .join('');
-  }
 
   const _verifyOnChain = async function() {
     if (typeof window.ethereum == null) {alert('MetaMask is not installed!');return;}

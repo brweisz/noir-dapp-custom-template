@@ -186,13 +186,14 @@ export default function NoirPlayground() {
         </div>
 
 
-        <div style={{ display: 'flex' }}>
-          <button className="button prove-button" type="submit" id="submit">Calculate proof</button>
-          <div className="spinner-button" id="spinner"></div>
-        </div>
+
 
         <div className="actions-section">
           <div className="column-workflow">
+            <div style={{ display: 'flex' }}>
+              <button className="button verify-button" type="submit" id="submit">Calculate proof</button>
+              <div className="spinner-button" id="spinner"></div>
+            </div>
             <button className="button verify-button" type="button" onClick={generateContract}
                     disabled={!currentCompiledCircuit}>
               {contractAddress ? 'Re-Generate Verifier Contract' : 'Generate Verifier Contract'}
@@ -205,15 +206,16 @@ export default function NoirPlayground() {
             </button>
 
             {contractAddress && <p className="contract-address">Contract deployed in address {contractAddress}</p>}
-            <button className="button verify-button" type="button" onClick={verifyOnChain}
-                    disabled={!contractAddress}>
-              Verify on-chain
-            </button>
+
           </div>
           <div className="column-workflow">
             <button className="button verify-button" type="button" onClick={verifyOffChain}
                     disabled={!currentCompiledCircuit}>
               Verify off-chain
+            </button>
+            <button className="button verify-button" type="button" onClick={verifyOnChain}
+                    disabled={!contractAddress}>
+              Verify on-chain
             </button>
           </div>
         </div>

@@ -184,10 +184,6 @@ export default function NoirPlayground() {
                           key={`${inputName}`} />;
           })}
         </div>
-
-
-
-
         <div className="actions-section">
           <div className="column-workflow">
             <div style={{ display: 'flex' }}>
@@ -209,7 +205,7 @@ export default function NoirPlayground() {
 
           </div>
           <div className="column-workflow">
-            <button className="button verify-button" type="button" onClick={verifyOffChain}
+            <button className="button verify-button" style={{ 'margin-bottom': '120px' }} type="button" onClick={verifyOffChain}
                     disabled={!currentCompiledCircuit}>
               Verify off-chain
             </button>

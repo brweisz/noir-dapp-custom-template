@@ -11,6 +11,7 @@ import { generateVerifierContract } from '../utils/generateVerifierContract.js';
 import { ultraVerifierAbi } from '../utils/verifierContractABI.ts';
 import { ethers } from 'ethers';
 import {bytesToHex, extractInputNames} from "../utils/utils.js"
+import {postCompileContract} from "../utils/apiClient.js"
 
 export default function Component() {
 
@@ -142,17 +143,7 @@ export default function Component() {
     await generateProof(inputs, noirProgram.value);
   };
 
-  const _compileContractOnServer = async(contractSourceCode) => {
-    const response = await fetch('/api/compile-contract', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ contractSourceCode }),
-    });
-    let response_data = await response.json();
-    return response_data.object;
-  }
+
 
   const _deployContractOnWeb = async function(abi, bytecode){
     if (typeof window.ethereum === "undefined") {alert("Please install Metamask!");return;}
@@ -197,7 +188,7 @@ export default function Component() {
   }
 
   const compileContractOnServer = async function(){
-    let { contractBytecode } = await toast.promise(_compileContractOnServer(contractSourceCode), {
+    let { contractBytecode } = await toast.promise(postCompileContract(contractSourceCode), {
       pending: 'Compiling contract on server...',
       success: 'Verifier contract compiled',
       error: 'Error compiling verifier contract',

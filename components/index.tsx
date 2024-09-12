@@ -2,7 +2,6 @@
 
 import React, { useState } from 'react';
 
-import { useOnChainVerification } from '../hooks/useOnChainVerification.js';
 import { compileCircuit, defaultCode } from '../utils/circuit.js';
 import { BarretenbergBackend } from '@noir-lang/backend_barretenberg';
 import { Noir } from '@noir-lang/noir_js';
@@ -19,7 +18,6 @@ export default function NoirPlayground() {
   let [sourceCodeError, setSourceCodeError] = useState("")
   let [contractSourceCode, setContractSourceCode] = useState()
   let [contractBytecode, setContractBytecode] = useState()
-  let { isConnected, connectDisconnectButton, address } = useOnChainVerification();
   const [backend, setBackend] = useState();
   let [provingArgs, setProvingArgs] = useState();
   const [currentCompiledCircuit, setCurrentCompiledCircuit] = useState();
@@ -101,7 +99,10 @@ export default function NoirPlayground() {
         setSourceCodeError("");
         setCurrentCompiledCircuit(compiledCircuit);
       })
-      .catch(error => setSourceCodeError(error.message))
+      .catch(error => {
+        setSourceCodeError(error.message);
+        throw error
+      })
   }
 
   const generateCircuit = async function(e){
@@ -162,7 +163,6 @@ export default function NoirPlayground() {
   return (
     <>
       <form className="container" onSubmit={submit}>
-        <div className="header">{connectDisconnectButton}</div>
         <h2>Noir <span className="funky-typography">Playground</span></h2>
         <h4>Write you own <i>Noir</i> circuit </h4>
         <p>main.nr</p>
@@ -187,17 +187,17 @@ export default function NoirPlayground() {
         <div className="actions-section">
           <div className="column-workflow">
             <div style={{ display: 'flex' }}>
-              <button className="button verify-button" type="submit" id="submit">Calculate proof</button>
+              <button className="button verify-button" type="submit" id="submit" disabled={!currentCompiledCircuit}>Calculate proof</button>
               <div className="spinner-button" id="spinner"></div>
             </div>
             <button className="button verify-button" type="button" onClick={generateContract}
                     disabled={!currentCompiledCircuit}>
               {contractAddress ? 'Re-Generate Verifier Contract' : 'Generate Verifier Contract'}
             </button>
-            <button className="button verify-button" type="button" onClick={compileContractOnServer}>
+            <button className="button verify-button" type="button" onClick={compileContractOnServer} disabled={!contractSourceCode}>
               Compile contract
             </button>
-            <button className="button verify-button" type="button" onClick={deployContractOnWeb}>
+            <button className="button verify-button" type="button" onClick={deployContractOnWeb} disabled={!contractBytecode}>
               Deploy contract
             </button>
 
@@ -206,10 +206,10 @@ export default function NoirPlayground() {
           </div>
           <div className="column-workflow">
             <button className="button verify-button" style={{ 'margin-bottom': '120px' }} type="button" onClick={verifyOffChain}
-                    disabled={!currentCompiledCircuit}>
+                    disabled={!provingArgs}>
               Verify off-chain
             </button>
-            <button className="button verify-button" type="button" onClick={verifyOnChain}
+            <button className="button verify-button" type="button" onClick={verifyOnChain} disabled={!provingArgs}
                     disabled={!contractAddress}>
               Verify on-chain
             </button>

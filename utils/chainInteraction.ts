@@ -32,5 +32,6 @@ export async function verifyOnChainEthers(contractAddress, provingArgs) {
     console.log("Transaction successful:", transaction);
   } catch (error) {
     console.error("Error making transaction:", error);
+    throw error
   }
 }

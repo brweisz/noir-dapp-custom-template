@@ -9,8 +9,7 @@ import { Noir } from '@noir-lang/noir_js';
 import { toast } from 'react-toastify';
 import { generateVerifierContract } from '../utils/generateVerifierContract.js';
 import { ultraVerifierAbi } from '../utils/verifierContractABI.ts';
-import { ethers } from 'ethers';
-import {bytesToHex, extractInputNames, extractInputsFromFormElements} from "../utils/utils.js"
+import {extractInputNames, extractInputsFromFormElements} from "../utils/utils.js"
 import {postCompileContract} from "../utils/apiClient.js"
 import {deployContractEthers, verifyOnChainEthers} from "../utils/chainInteraction.js"
 
@@ -97,7 +96,7 @@ export default function NoirPlayground() {
   }
 
   const _generateCircuit = async function(noirProgram: any){
-    compileCircuit(noirProgram)
+    return compileCircuit(noirProgram)
       .then(compiledCircuit => {
         setSourceCodeError("");
         setCurrentCompiledCircuit(compiledCircuit);
@@ -186,23 +185,17 @@ export default function NoirPlayground() {
           })}
         </div>
 
-        <div className="prove-options">
-          <div style={{ display: 'flex' }}>
-            <button className="button prove-button" type="submit" id="submit">Calculate proof</button>
-            <div className="spinner-button" id="spinner"></div>
-          </div>
+
+        <div style={{ display: 'flex' }}>
+          <button className="button prove-button" type="submit" id="submit">Calculate proof</button>
+          <div className="spinner-button" id="spinner"></div>
         </div>
+
         <div className="actions-section">
-          <div className="column-workflow">
-            <button className="button verify-button" type="button" onClick={verifyOffChain}
-                    disabled={!currentCompiledCircuit}>
-              Verify off-chain
-            </button>
-          </div>
           <div className="column-workflow">
             <button className="button verify-button" type="button" onClick={generateContract}
                     disabled={!currentCompiledCircuit}>
-              {contractAddress ? "Re-Generate Verifier Contract" : "Generate Verifier Contract"}
+              {contractAddress ? 'Re-Generate Verifier Contract' : 'Generate Verifier Contract'}
             </button>
             <button className="button verify-button" type="button" onClick={compileContractOnServer}>
               Compile contract
@@ -211,10 +204,16 @@ export default function NoirPlayground() {
               Deploy contract
             </button>
 
-            {contractAddress && <p className='contract-address'>Contract deployed in address {contractAddress}</p>}
+            {contractAddress && <p className="contract-address">Contract deployed in address {contractAddress}</p>}
             <button className="button verify-button" type="button" onClick={verifyOnChain}
                     disabled={!contractAddress}>
               Verify on-chain
+            </button>
+          </div>
+          <div className="column-workflow">
+            <button className="button verify-button" type="button" onClick={verifyOffChain}
+                    disabled={!currentCompiledCircuit}>
+              Verify off-chain
             </button>
           </div>
         </div>

@@ -3,12 +3,12 @@
 import React, { useState } from 'react';
 
 import { useOnChainVerification } from '../hooks/useOnChainVerification.js';
-import { compileCircuit } from '../circuit/compile.js';
+import { compileCircuit, defaultCode } from '../utils/circuit.js';
 import { BarretenbergBackend } from '@noir-lang/backend_barretenberg';
 import { Noir } from '@noir-lang/noir_js';
 import { toast } from 'react-toastify';
-import { generateVerifierContract } from './generateVerifierContract.js';
-import { ultraVerifierAbi } from '../hooks/verifierContractABI.ts';
+import { generateVerifierContract } from '../utils/generateVerifierContract.js';
+import { ultraVerifierAbi } from '../utils/verifierContractABI.ts';
 import { ethers } from 'ethers';
 
 export default function Component() {
@@ -180,10 +180,6 @@ export default function Component() {
       success: 'Verifier contract deployed',
       error: 'Error deploying verifier contract',
     });
-  }
-
-  const defaultCode = function(){
-    return `fn main(x: Field, y:Field){ \n assert(x==y); \n }`
   }
 
   const _extractInputNames = function(programSourceCode){

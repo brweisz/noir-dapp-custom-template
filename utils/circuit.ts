@@ -21,6 +21,12 @@ function defaultNargoToml(){
   `
 }
 
+export function defaultCode(){
+  return `fn main(x: Field, y:Field){
+  assert(x==y);
+}`
+}
+
 export async function compileCircuit(noirProgram: string) {
   const fm = createFileManager('/');
   await fm.writeFile('./src/main.nr', stringToStream(noirProgram));

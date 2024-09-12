@@ -12,9 +12,9 @@ import { ultraVerifierAbi } from '../utils/verifierContractABI.ts';
 import { ethers } from 'ethers';
 import {bytesToHex, extractInputNames, extractInputsFromFormElements} from "../utils/utils.js"
 import {postCompileContract} from "../utils/apiClient.js"
-import {deployContractEthers} from "../utils/deploy.js"
+import {deployContractEthers, verifyOnChainEthers} from "../utils/chainInteraction.js"
 
-export default function Component() {
+export default function NoirPlayground() {
 
   let [inputNames, setInputNames] = useState(["x", "y"])
   let [sourceCodeError, setSourceCodeError] = useState("")
@@ -27,25 +27,8 @@ export default function Component() {
 
   let [contractAddress, setContractAddress] = useState();
 
-  const _verifyOnChain = async function() {
-    if (typeof window.ethereum == null) {alert('MetaMask is not installed!');return;}
-    try {
-      await window.ethereum.request({ method: 'eth_requestAccounts' });
-      const provider = new ethers.BrowserProvider(window.ethereum)
-      const signer = await provider.getSigner();
-      const contract = new ethers.Contract(contractAddress, ultraVerifierAbi, signer);
-      let proofToSend = bytesToHex(provingArgs.proof)
-      let publicInputsToSend = provingArgs.publicInputs as `0x${string}`[]
-      const transaction = await contract.verify(proofToSend, publicInputsToSend);
-
-      console.log("Transaction successful:", transaction);
-    } catch (error) {
-      console.error("Error making transaction:", error);
-    }
-  }
-
   const verifyOnChain = async function(){
-    await toast.promise(_verifyOnChain(), {
+    await toast.promise(verifyOnChainEthers(), {
       pending: 'Verifying proof on-chain',
       success: 'Proof verified on-chain',
       error: 'Error verifying proof on-chain',
@@ -53,7 +36,6 @@ export default function Component() {
   }
 
   const generateProof = async (inputs: any) => {
-
     const noir = new Noir(currentCompiledCircuit);
     await toast.promise(noir.init, {
       pending: 'Initializing Noir...',

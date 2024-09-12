@@ -5,7 +5,7 @@ import ReactDOM from 'react-dom/client';
 import './App.css';
 import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer } from 'react-toastify';
-import Component from './components/index.js';
+import NoirPlayground from './components/index.js';
 import initNoirC from '@noir-lang/noirc_abi';
 import initACVM from '@noir-lang/acvm_js';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -66,7 +66,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <Providers>
     <InitWasm>
-      <Component />
+      <NoirPlayground />
       <ToastContainer />
     </InitWasm>
   </Providers>,

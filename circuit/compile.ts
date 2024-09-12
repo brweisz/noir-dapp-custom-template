@@ -12,21 +12,6 @@ function stringToStream(text: string): ReadableStream<Uint8Array> {
   });
 }
 
-async function streamToString(stream: ReadableStream<Uint8Array>): Promise<string> {
-  const reader = stream.getReader();
-  let result = '';
-  const decoder = new TextDecoder();
-
-  while (true) {
-    const { done, value } = await reader.read();
-    if (done) break;
-    result += decoder.decode(value, { stream: true });
-  }
-
-  result += decoder.decode(); // decode any remaining bytes
-  return result;
-}
-
 function defaultNargoToml(){
   return `[package]
   name = "noirPlayground"

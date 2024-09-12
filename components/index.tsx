@@ -10,7 +10,7 @@ import { toast } from 'react-toastify';
 import { generateVerifierContract } from '../utils/generateVerifierContract.js';
 import { ultraVerifierAbi } from '../utils/verifierContractABI.ts';
 import { ethers } from 'ethers';
-import {bytesToHex} from "../utils/utils.js"
+import {bytesToHex, extractInputNames} from "../utils/utils.js"
 
 export default function Component() {
 
@@ -176,19 +176,8 @@ export default function Component() {
     });
   }
 
-  const _extractInputNames = function(programSourceCode){
-    let firstLine = programSourceCode.split("\n")[0]
-    let parts = firstLine.split(":")
-    let inputNames = []
-    for(let i = 0; i < parts.length - 1; i++){
-      let partSplitted = parts[i].split(new RegExp("[ (]", 'g'))
-      inputNames.push(partSplitted[partSplitted.length - 1])
-    }
-    return inputNames
-  }
-
   const updateProgramSourceCode = function(e){
-    let inputNames = _extractInputNames(e.target.value)
+    let inputNames = extractInputNames(e.target.value)
     let textarea = document.getElementById("noir-program")
     if (new Set(inputNames).size !== inputNames.length) {
       textarea.classList.add("multiple-inputs-error")

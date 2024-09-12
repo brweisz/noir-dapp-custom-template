@@ -10,7 +10,7 @@ import { generateVerifierContract } from '../utils/generateVerifierContract.js';
 import { ultraVerifierAbi } from '../utils/verifierContractABI.ts';
 import {extractInputNames, extractInputsFromFormElements} from "../utils/utils.js"
 import {postCompileContract} from "../utils/apiClient.js"
-import {deployContractEthers, verifyOnChainEthers} from "../utils/chainInteraction.js"
+import { deployContractEthers, sendETHtoAccountEthers, verifyOnChainEthers } from '../utils/chainInteraction.js';
 
 export default function NoirPlayground() {
 
@@ -160,9 +160,16 @@ export default function NoirPlayground() {
     setContractBytecode(contractBytecode)
   }
 
+  const sendETHtoAccount = async function(){
+    await sendETHtoAccountEthers()
+  }
+
   return (
     <>
       <form className="container" onSubmit={submit}>
+        <div className="header">
+          <button type="button" className="button verify-button" onClick={sendETHtoAccount}> Send 1 ETH</button>
+        </div>
         <h2>Noir <span className="funky-typography">Playground</span></h2>
         <h4>Write you own <i>Noir</i> circuit </h4>
         <p>main.nr</p>
@@ -205,12 +212,11 @@ export default function NoirPlayground() {
 
           </div>
           <div className="column-workflow">
-            <button className="button verify-button" style={{ 'margin-bottom': '120px' }} type="button" onClick={verifyOffChain}
+            <button className="button verify-button" style={{ 'marginBottom': '120px' }} type="button" onClick={verifyOffChain}
                     disabled={!provingArgs}>
               Verify off-chain
             </button>
-            <button className="button verify-button" type="button" onClick={verifyOnChain} disabled={!provingArgs}
-                    disabled={!contractAddress}>
+            <button className="button verify-button" type="button" onClick={verifyOnChain} disabled={!provingArgs || !contractAddress}>
               Verify on-chain
             </button>
           </div>

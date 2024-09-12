@@ -1,5 +1,5 @@
 import express from 'express';
-import { writeFileSync } from 'fs';
+import { writeFileSync, readFileSync } from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import hardhat from 'hardhat';
@@ -26,9 +26,7 @@ async function compileContract(contractSourceCode){
 
   // Compile contract
   console.log("Compiling contract")
-  await hardhat.run('compile', {
-    sources: [filePath]
-  });
+  await hardhat.run('compile');
   console.log("Contract compiled")
 }
 
@@ -78,6 +76,25 @@ app.post("/compile-and-deploy-contract", async (req, res) => {
   }
   res.send(response);
 });
+
+app.post("/compile-contract", async (req,res) => {
+  let response = { object: undefined, errors: [] }
+  try {
+    let { contractSourceCode } = req.body;
+
+    await compileContract(contractSourceCode)
+    let file = readFileSync("./artifacts/hardhat/artifacts/SolidityVerifier.sol/UltraVerifier.json", "utf8")
+    let json_file = JSON.parse(file)
+    let contractBytecode = json_file.bytecode
+    response.object = {
+      contractBytecode
+    }
+  } catch (e) {
+    console.log(e)
+    response.errors.push(e.message)
+  }
+  res.send(response);
+})
 
 const PORT = 3000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}!`));

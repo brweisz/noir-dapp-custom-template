@@ -16,11 +16,13 @@ export default function Component() {
 
   let [inputNames, setInputNames] = useState(["x", "y"])
   let [sourceCodeError, setSourceCodeError] = useState("")
+  let [contractSourceCode, setContractSourceCode] = useState()
+  let [contractBytecode, setContractBytecode] = useState()
   let { isConnected, connectDisconnectButton, address } = useOnChainVerification();
   const [backend, setBackend] = useState();
   let [provingArgs, setProvingArgs] = useState();
   const [currentCompiledCircuit, setCurrentCompiledCircuit] = useState();
-  let [proveOnServer, setProveOnServer] = useState(false);
+  let [deployOnServer, setDeployOnServer] = useState(false);
 
   let [contractAddress, setContractAddress] = useState();
 
@@ -31,8 +33,7 @@ export default function Component() {
   }
 
   const _verifyOnChain = async function() {
-    if (typeof window.ethereum == null) alert('MetaMask is not installed!');
-
+    if (typeof window.ethereum == null) {alert('MetaMask is not installed!');return;}
     try {
       await window.ethereum.request({ method: 'eth_requestAccounts' });
       const provider = new ethers.BrowserProvider(window.ethereum)
@@ -163,6 +164,43 @@ export default function Component() {
     setContractAddress(address)
   }
 
+  const _compileContractOnServer = async(contractSourceCode) => {
+    const response = await fetch('/api/compile-contract', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ contractSourceCode }),
+    });
+    return response.object;
+  }
+
+  const _deployContractOnWeb = async function(contractABI, contractBytecode){
+    if (typeof window.ethereum === "undefined") {alert("Please install Metamask!");return;}
+
+    await ethereum.request({ method: 'eth_requestAccounts' });
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    const signer = provider.getSigner();
+    const factory = new ethers.ContractFactory(abi, bytecode, signer);
+    try {
+      const contract = await factory.deploy();
+      await contract.waitForDeployment();
+      console.log("Contract deployed at:", contract.getAddress());
+    } catch (error) {
+      console.error("Error deploying contract:", error);
+    }
+  }
+
+  const deployContractOnWeb = async function(){
+    let contractABI = "..."
+    let contractBytecode = "..."
+    await toast.promise(_deployContractOnWeb(contractABI, contractBytecode), {
+      pending: 'Deploying contract from browser...',
+      success: 'Verifier contract deployed',
+      error: 'Error deploying verifier contract',
+    });
+  }
+
   const compileAndDeploy = async (contractSourceCode) => {
     const response = await fetch('/api/compile-and-deploy-contract', {
       method: 'POST',
@@ -204,6 +242,24 @@ export default function Component() {
     }
   }
 
+  const generateContract = async function(){
+    let contractSourceCode = await toast.promise(generateVerifierContract(currentCompiledCircuit), {
+      pending: 'Generating verifier contract on browser...',
+      success: 'Verifier contract generated',
+      error: 'Error generating verifier contract',
+    });
+    setContractSourceCode(contractSourceCode)
+  }
+
+  const compileContractOnServer = async function(){
+    let contractBytecode = await toast.promise(_compileContractOnServer(contractSourceCode), {
+      pending: 'Compiling contract on server...',
+      success: 'Verifier contract compiled',
+      error: 'Error compiling verifier contract',
+    });
+    setContractBytecode(contractBytecode)
+  }
+
   return (
     <>
       <form className="container" onSubmit={submit}>
@@ -231,11 +287,11 @@ export default function Component() {
         </div>
 
         <div className="prove-options">
-          <div className="prove-server-options">
+          {/*<div className="prove-server-options">
             <p>On browser</p>
             <Switch onChange={(checked) => setProveOnServer(checked)} checked={proveOnServer} />
             <p>On server</p>
-          </div>
+          </div>*/}
           <div style={{ display: 'flex' }}>
             <button className="button prove-button" type="submit" id="submit">Calculate proof</button>
             <div className="spinner-button" id="spinner"></div>
@@ -249,10 +305,17 @@ export default function Component() {
             </button>
           </div>
           <div className="column-workflow">
-            <button className="button verify-button" type="button" onClick={generateAndDeployContract}
+            <button className="button verify-button" type="button" onClick={generateContract}
                     disabled={!currentCompiledCircuit}>
               {contractAddress ? "Re-Generate Verifier Contract" : "Generate Verifier Contract"}
             </button>
+            <button className="button verify-button" type="button" onClick={compileContractOnServer}>
+              Compile contract
+            </button>
+            <button className="button verify-button" type="button" onClick={deployContractOnWeb}>
+              Deploy contract
+            </button>
+
             {contractAddress && <p className='contract-address'>Contract deployed in address {contractAddress}</p>}
             <button className="button verify-button" type="button" onClick={verifyOnChain}
                     disabled={!contractAddress}>

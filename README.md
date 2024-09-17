@@ -21,7 +21,7 @@ node --watch app.js
 
 run the frontend environment:
 ```bash
-vite dev
+bunx vite dev
 ```
 
 3. When you're running your local hardhat network and want to deploy a contract using your Metamask account, you'll need to transfer some ETH in the network to your account. For that there's a button on the top-left of the screen. 

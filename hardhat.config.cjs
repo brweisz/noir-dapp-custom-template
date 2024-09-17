@@ -36,6 +36,7 @@ task('node', 'Runs a local blockchain').setAction(async (_, hre, runSuper) => {
   mkdirSync('artifacts', { recursive: true });
   writeFileSync('artifacts/deployment.json', JSON.stringify(config), { flag: 'w' });
   await runSuper();
+  await hre.network.provider.send("hardhat_reset")
 })
 
 module.exports = {

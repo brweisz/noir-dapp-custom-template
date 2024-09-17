@@ -6,7 +6,7 @@ const { task } = require('hardhat/config');
 
 const { subtask, vars } = require('hardhat/config');
 const { TASK_COMPILE_SOLIDITY } = require('hardhat/builtin-tasks/task-names');
-const { join, resolve } = require('path');
+const { join } = require('path');
 const { writeFile } = require('fs/promises');
 const { mkdirSync, writeFileSync } = require('fs');
 
@@ -57,6 +57,10 @@ module.exports = {
       accounts: vars.has('localhost')
         ? [vars.get('localhost')]
         : ['0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80'],
+      mining: {
+        auto: false,
+        interval: 5000
+      }
     },
     scrollSepolia: {
       url: 'https://sepolia-rpc.scroll.io',

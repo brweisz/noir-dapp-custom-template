@@ -13,24 +13,18 @@ import { WagmiProvider, createConfig, http } from 'wagmi';
 import { defineChain, createClient } from 'viem';
 import { injected } from 'wagmi/connectors';
 import { networkConfig } from "./artifacts/deployment.json"
-
+import { mainnet, sepolia } from 'wagmi/chains'
 
 const queryClient = new QueryClient();
 
-const { id, name, nativeCurrency, rpcUrls } = networkConfig;
-const chain = defineChain({
-    id,
-    name,
-    nativeCurrency,
-    rpcUrls
-})
+// const { id, name, nativeCurrency, rpcUrls } = networkConfig;
+// const dev_chain = defineChain({ id, name, nativeCurrency, rpcUrls })
+const dev_chain = defineChain(networkConfig)
 
 const config = createConfig({
-  connectors: [
-    injected()
-  ],
-  chains: [chain],
-  client({ chain}) {
+  connectors: [injected()],
+  chains: [dev_chain, mainnet, sepolia],
+  client({ chain }) {
     return createClient({ chain, transport: http() })
   }
 })
@@ -58,7 +52,9 @@ export function Providers({ children }: { children: React.ReactNode }) {
   React.useEffect(() => setMounted(true), []);
   return (
     <WagmiProvider config={config}>
-      <QueryClientProvider client={queryClient}>{mounted && children}</QueryClientProvider>
+      <QueryClientProvider client={queryClient}>
+        {mounted && children}
+      </QueryClientProvider>
     </WagmiProvider>
   );
 }

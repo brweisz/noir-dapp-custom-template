@@ -11,6 +11,7 @@ import { ultraVerifierAbi } from '../utils/verifierContractABI.ts';
 import {extractInputNames, extractInputsFromFormElements} from "../utils/utils.js"
 import {postCompileContract} from "../utils/apiClient.js"
 import { deployContractEthers, sendETHtoAccountEthers, verifyOnChainEthers } from '../utils/chainInteraction.js';
+import { useOnChainVerification } from '../hooks/useOnChainVerification.js';
 
 export default function NoirPlayground() {
 
@@ -23,6 +24,7 @@ export default function NoirPlayground() {
   const [currentCompiledCircuit, setCurrentCompiledCircuit] = useState();
 
   let [contractAddress, setContractAddress] = useState();
+  let {isConnected, address, connectDisconnectButton, chainSelector} = useOnChainVerification()
 
   const verifyOnChain = async function(){
     await toast.promise(verifyOnChainEthers(contractAddress, provingArgs), {
@@ -164,11 +166,17 @@ export default function NoirPlayground() {
     await sendETHtoAccountEthers()
   }
 
+  const connectWallet = async function() {
+
+  }
+
   return (
     <>
       <form className="container" onSubmit={submit}>
         <div className="header">
           <button type="button" className="button verify-button" onClick={sendETHtoAccount}> Send 1 ETH</button>
+          {chainSelector}
+          {connectDisconnectButton}
         </div>
         <h2>Noir <span className="funky-typography">Playground</span></h2>
         <h4>Write you own <i>Noir</i> circuit </h4>

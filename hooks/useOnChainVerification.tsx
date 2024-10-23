@@ -4,9 +4,8 @@ import React, { useEffect, useState } from 'react';
 export function useOnChainVerification() {
   const { connect, connectors } = useConnect();
   const { disconnect } = useDisconnect();
-  const { isConnected, address } = useAccount();
+  const { isConnected, address, status, chain } = useAccount();
   const { chains, switchChain } = useSwitchChain();
-  const [selectedChain, setSelectedChain] = useState();
 
   useEffect(() => {
     console.log('Aviable chains:', chains.map(chain => chain.name));
@@ -51,5 +50,5 @@ export function useOnChainVerification() {
       </div>
     );
 
-  return { isConnected, address, connectDisconnectButton, chainSelector };
+  return { isConnected, address, connectDisconnectButton, chainSelector, connectedTo: chain };
 }

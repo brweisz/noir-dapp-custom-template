@@ -24,7 +24,7 @@ export default function NoirPlayground() {
   const [currentCompiledCircuit, setCurrentCompiledCircuit] = useState();
 
   let [contractAddress, setContractAddress] = useState();
-  let {isConnected, address, connectDisconnectButton, chainSelector} = useOnChainVerification()
+  let {isConnected, address, connectDisconnectButton, chainSelector, connectedTo} = useOnChainVerification()
 
   const verifyOnChain = async function(){
     await toast.promise(verifyOnChainEthers(contractAddress, provingArgs), {
@@ -164,10 +164,6 @@ export default function NoirPlayground() {
 
   const sendETHtoAccount = async function(){
     await sendETHtoAccountEthers()
-  }
-
-  const connectWallet = async function() {
-
   }
 
   return (

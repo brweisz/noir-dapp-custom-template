@@ -22,7 +22,8 @@ Still, there are many possible evolution paths for this project. Some of the mai
   * Circuit execution
   * Proof generation
   * Contract generation
-* Use a database and some way to recognize the user to facilitate the access to the history of deployed contracts (right now is the user's responsibility to preserve that information). 
+* Use a database and some way to recognize the user to facilitate the access to the history of deployed contracts (right now is the user's responsibility to preserve that information).
+* Extend it to use UltraHonk instead of UltraPlonk.
 
 1. Install dependencies:
 ```bash

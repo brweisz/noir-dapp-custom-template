@@ -1,5 +1,7 @@
 # noir-dapp-custom-template
-This project is what its name says: a playground. Noir setup is already simple, but this website aims to make it even simpler: just enter and start writing you verifier contracts with a few clicks! The project has space still for a lot of growing. The features available right now are:
+This project is what its name says: a playground. Noir setup is already simple, but this website aims to make it even simpler: just enter and start writing you verifier contracts with a few clicks! It also works as a flexible template for creating dapps with Noir (that was actually the main idea when it started).  
+
+The project has space still for a lot of growing. The features available right now are:
 * Write a Noir program
 * Fill the inputs
 * Execute the program generating the circuit and the witnesses involved (in the browser)

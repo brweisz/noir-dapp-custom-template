@@ -25,6 +25,8 @@ Still, there are many possible evolution paths for this project. Some of the mai
 * Use a database and some way to recognize the user to facilitate the access to the history of deployed contracts (right now is the user's responsibility to preserve that information).
 * Extend it to use UltraHonk instead of UltraPlonk.
 
+## Installation
+
 1. Install dependencies:
 ```bash
 nvm use 20.10.0
